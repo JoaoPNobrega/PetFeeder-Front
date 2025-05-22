@@ -566,7 +566,6 @@
     // Scroll sincronizado + gif animado por scroll
     const gif = document.getElementById("scrollGif");
     const totalFrames = 37;
-
     const scrollTexto = document.querySelector(".sobreTextoBox");
     const scrollGifContainer = document.getElementById("scrollGifContainer");
 
@@ -578,8 +577,13 @@
 
       const percent = source.scrollTop / (source.scrollHeight - source.clientHeight);
       const frameIndex = Math.min(totalFrames - 1, Math.floor(percent * totalFrames));
-      gif.src = `frames/frame (${frameIndex + 1}).gif`;
+
+      const nomeArquivo = `Embarcados2/data/frames/frame (${frameIndex + 1}).gif`;
+      const urlGitHub = `https://joaopnobrega.github.io/PetFeeder-Front/${encodeURIComponent(nomeArquivo)}`;
+      gif.src = urlGitHub;
     }
+
+
 
     function toggleFadeEffect() {
       const fade = document.getElementById("fadeEffect");
