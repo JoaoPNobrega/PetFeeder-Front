@@ -569,6 +569,17 @@
     const scrollTexto = document.querySelector(".sobreTextoBox");
     const scrollGifContainer = document.getElementById("scrollGifContainer");
 
+    // Pré-carrega os 37 frames
+    const frameCache = [];
+    for (let i = 1; i <= totalFrames; i++) {
+      const nomeArquivo = `Embarcados2/data/frames/frame (${i}).gif`;
+      const urlGitHub = `https://joaopnobrega.github.io/PetFeeder-Front/${encodeURIComponent(nomeArquivo)}`;
+      const img = new Image();
+      img.src = urlGitHub;
+      frameCache.push(img);
+    }
+
+
     function syncScroll(e) {
       const source = e.target;
       const target = source === scrollTexto ? scrollGifContainer : scrollTexto;
@@ -622,6 +633,8 @@ const observer = new IntersectionObserver(entries => {
 document.querySelectorAll('.sobreTextoBox p').forEach(p => {
   observer.observe(p);
 });
+
+
 
 </script>
 
