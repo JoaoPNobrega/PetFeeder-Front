@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard PetFeeder</title>
+  <style>
+
+    :root {
+      --bg-ios: #1c1c1e;
+      --card-ios: #2c2c2e;
+      --text-ios: #f2f2f7;
+      --accent-ios: #8e8e93;
+      --button-ios: #3a3a3c;
+      --scrollbar-thumb: #5c5c5c;
+      --scrollbar-track: #2c2c2e;
+    }
+    .destaque-verde {
+      color: #30d158 !important;
+      font-weight: bold;
+    }
+    .relatorioItem {
+      position: relative;
+    }
+    .botaoExcluir {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: transparent;
+      border: none;
+      color: #ff453a;
+      font-size: 1.4rem;
+      cursor: pointer;
+    }
+    #textoAnimado {
+      margin-top: 2px !important;
+    }
+
+    * {
+      box-sizing: border-box;
+      transition: all 0.3s ease;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+
+      background: var(--bg-ios);
+      color: var(--text-ios);
+    }
+
+    header {
+      background: var(--card-ios);
+      color: var(--text-ios);
+      padding: 1rem 2rem;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    }
+
+    .abaBtn.ativo {
+      background-color: #30d158; /* iOS-style green */
+      color: #fff;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      padding: 2rem;
+    }
+
+    .card {
+      background: var(--card-ios);
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      padding: 1.5rem;
+    }
+
+    .card h3 {
+      margin-bottom: 1rem;
+      color: var(--text-ios);
+    }
+
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    button {
+      padding: 0.75rem;
+      font-size: 1rem;
+      border-radius: 12px;
+      border: none;
+      background-color: var(--button-ios);
+      color: var(--text-ios);
+      cursor: pointer;
+      width: 100%;
+    }
+
+    .abaBtn {
+      padding: 0.75rem;
+      font-size: 1rem;
+      border-radius: 12px;
+      border: none;
+      background: var(--button-ios);
+      color: var(--text-ios);
+      flex: 1;
+    }
+
+    .abaBtn:hover,
+    button:hover {
+      background-color: #48484a;
+    }
+
+    #tempoLabel {
+      text-align: center;
+      margin-top: 0.5rem;
+      font-size: 1rem;
+    }
+
+    input[type="range"] {
+      width: 100%;
+    }
+
+    #relatorioContainer {
+      grid-column: span 2;
+      background: var(--card-ios);
+      border-radius: 16px;
+      padding: 1.5rem;
+      display: none;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.5s ease;
+    }
+
+    #relatorioContainer.mostrar {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .relatorioItem {
+      background: #3a3a3c;
+      margin-bottom: 1rem;
+      padding: 1rem;
+      border-radius: 12px;
+      animation: fadeIn 0.6s ease-in;
+    }
+
+    .abaRelatorio {
+      display: none;
+    }
+
+    .abaBtns-container {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    #sobreDashboard {
+      display: none;
+      grid-column: span 1; /* Ocupa uma única coluna */
+      background: var(--card-ios);
+      border-radius: 16px;
+      padding: 0;
+      height: 228px; /* Mantido conforme seu pedido */
+      display: flex;
+      flex-direction: row;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.5s ease;
+      width: 100%;      /* Ocupa 100% da coluna */
+      max-width: 100%;  /* Garante que não ultrapasse */
+    }
+
+
+
+    #sobreDashboard.mostrar {
+      display: flex;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .scrollSyncWrapper {
+      display: flex;
+      width: 100%;
+      height: 100%;
+    }
+
+    .sobreTextoBox {
+      width: 50%;
+      height: 100%;
+      background: #3a3a3c;
+      border-radius: 16px 0 0 16px;
+      padding: 1rem;
+      overflow-y: auto;
+      position: relative; /* Necessário para posicionar o gradiente interno */
+    }
+
+    .sobreTextoBox h4 {
+      margin-top: 0;
+      font-size: 1.4rem; /* Título maior */
+    }
+
+    .sobreTextoBox p {
+      font-size: 1.1rem; /* Texto maior para exigir scroll mesmo com texto menor */
+      line-height: 1.6;
+    }
+
+    #scrollGifContainer {
+      width: 50%;
+      height: 100%;
+      overflow-y: auto;
+      background: #2c2c2e;
+      border-radius: 0 16px 16px 0;
+      padding: 1rem 1rem 1rem 0.5rem; /* menos padding à esquerda */
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+    }
+
+    #scrollGif {
+      max-width: 95%; /* não encosta na barra */
+      max-height: 180px;
+      border-radius: 10px;
+      border: 1px solid #444;
+    }
+
+    .sobreTextoBox::-webkit-scrollbar,
+    #scrollGifContainer::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .sobreTextoBox::-webkit-scrollbar-thumb,
+    #scrollGifContainer::-webkit-scrollbar-thumb {
+      background-color: var(--scrollbar-thumb);
+      border-radius: 4px;
+    }
+
+    .sobreTextoBox::-webkit-scrollbar-track,
+    #scrollGifContainer::-webkit-scrollbar-track {
+      background-color: var(--scrollbar-track);
+    }
+
+    @media (max-width: 768px) {
+      #sobreDashboard {
+        flex-direction: column;
+        width: 100%;
+        height: auto;
+      }
+
+      .scrollSyncWrapper {
+        flex-direction: column;
+      }
+
+      .sobreTextoBox,
+      #scrollGifContainer {
+        width: 100%;
+        height: 200px;
+        border-radius: 12px;
+      }
+    }
+  
+.sobreTextoBox p {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.sobreTextoBox p.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+#gifNotificacao {
+  position: fixed;
+  top: 4rem; /* mais para baixo */
+  right: 1rem;
+  width: 120px;
+  height: 120px;
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+  border-radius: 16px; /* bordas mais suaves */
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5); /* sombra para destaque */
+}
+
+#gifNotificacao.mostrar {
+  opacity: 1;
+}
+
+</style>
+</head>
+<body>
+  <header>
+    <h1>Dashboard PetFeeder</h1>
+  </header>
+
+  <div class="container">
+    <div class="card"> 
+      <h3>Controle Remoto</h3>
+      <div class="controls">
+        <button onclick="abrirPorta()">Abrir PetFeeder</button>
+        <label for="tempoRange">⏱️ Tempo de Abertura (ms)</label>
+        <input type="range" id="tempoRange" min="1000" max="10000" step="1000" value="5000">
+        <div id="tempoLabel">5000 ms</div>
+        <button onclick="definirTempo()">Definir Tempo</button>
+        <div style="display: flex; gap: 1rem;">
+          <button onclick="alternarRelatorio()" class="abaBtn">📄 Ver Relatório</button>
+          <button onclick="alternarSobre()" class="abaBtn">ℹ️ Sobre o Dashboard</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Últimos Dados</h3>
+      <p><strong>Distância:</strong> <span id="distancia">173.468</span> cm</p>
+      <p><strong>Potenciômetro:</strong> <span id="pot">0</span></p>
+      <p><strong>Tempo Abertura:</strong> <span id="tempo">5000</span> ms</p>
+      <p><strong>Modo:</strong> <span id="modo" class="">firebase</span></p>
+      <p><strong>Evento:</strong> <span id="evento" class="">Monitoramento contínuo</span></p>
+    </div>
+
+    <div id="relatorioContainer" class="mostrar">
+      <h3>📊 Relatórios Gerados</h3>
+      <div class="abaBtns-container">
+        <button onclick="mostrarAba('firebase')" class="abaBtn ativo" data-aba="firebase">🌐 Firebase</button>
+        <button onclick="mostrarAba('botao')" class="abaBtn" data-aba="botao">🖱️ Botão</button>
+        <button onclick="mostrarAba('sensor')" class="abaBtn" data-aba="sensor">📡 Sensor</button>
+      </div>
+
+
+      <div id="firebase" class="abaRelatorio" style="display: block;"></div>
+      <div id="botao" class="abaRelatorio" style="display: none;"></div>
+      <div id="sensor" class="abaRelatorio" style="display: none;"></div>
+    </div>
+
+    <div id="sobreDashboard" class="">
+    <div class="scrollSyncWrapper">
+      <div class="sobreTextoBox" id="syncTexto">
+        <h4>Protótipo</h4>
+        <p class="visible">
+          O foco do projeto foi cumprir os requisitos da disciplina de Sistemas Embarcados. Começamos com um sensor PIR, mas trocamos por um ultrassônico mais preciso. O potenciômetro controla a quantidade de ração, e um LED indica a abertura do alimentador. Enfrentamos problemas com fios defeituosos e um curto inicial, o que reforçou a importância da organização. Finalizamos com a integração do Firebase para controle remoto e registro dos dados.
+        </p>
+       
+      </div>
+      <div id="scrollGifContainer">
+        <img id="scrollGif" src="/frames/frame (1).gif" alt="gif">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const firebaseUrl = "https://petfeed-se-default-rtdb.firebaseio.com/";
+    let ultimoEvento = null;
+
+    function destacarElemento(el, duracao) {
+      el.classList.add("destaque-verde");
+      setTimeout(() => el.classList.remove("destaque-verde"), duracao || 1000);
+    }
+
+    document.getElementById("tempoRange").addEventListener("input", function () {
+      document.getElementById("tempoLabel").textContent = `${this.value} ms`;
+    });
+
+    function excluirRelatorio(btn) {
+      const item = btn.closest(".relatorioItem");
+      if (item) item.remove();
+    }
+
+    function gerarRelatorioComDados(dados) {
+      const evento = dados.evento?.toLowerCase() || "";
+      let aba = "";
+
+      if (evento.includes("firebase")) aba = "firebase";
+      else if (evento.includes("botão") || evento.includes("botao")) aba = "botao";
+      else if (evento.includes("sensor")) aba = "sensor";
+      else return;
+
+      const container = document.getElementById(aba);
+      const novoItem = document.createElement("div");
+      novoItem.classList.add("relatorioItem");
+      novoItem.innerHTML = `
+        <button class="botaoExcluir" onclick="excluirRelatorio(this)">&#x2715;</button>
+        <ul>
+          <li><strong>Data:</strong> ${new Date().toLocaleString()}</li>
+          <li><strong>Distância:</strong> ${dados.distancia_cm} cm</li>
+          <li><strong>Potenciômetro:</strong> ${dados.potenciometro}</li>
+          <li><strong>Tempo de Abertura:</strong> ${dados.tempo_aberto_ms} ms</li>
+          <li><strong>Modo:</strong> ${dados.modo}</li>
+          <li><strong>Evento:</strong> ${dados.evento}</li>
+        </ul>
+      `;
+      container.prepend(novoItem);
+    }
+
+    async function abrirPorta() {
+      const tempo = parseInt(document.getElementById("tempoRange").value);
+
+      await fetch(firebaseUrl + "comando/abrir.json", {
+        method: "PUT",
+        body: "true"
+      });
+
+      alert("✅ PetFeeder será aberto");
+    }
+
+    async function definirTempo() {
+      const tempo = parseInt(document.getElementById("tempoRange").value);
+      await fetch(firebaseUrl + "comando/tempo_remoto_ms.json", {
+        method: "PUT",
+        body: tempo.toString()
+      });
+      alert(`✅ Tempo definido: ${tempo} ms`);
+    }
+
+    function atualizarDashboard(dados) {
+      const distancia = document.getElementById('distancia');
+      const pot = document.getElementById('pot');
+      const tempo = document.getElementById('tempo');
+      const modo = document.getElementById('modo');
+      const evento = document.getElementById('evento');
+
+      distancia.textContent = dados.distancia_cm;
+      pot.textContent = dados.potenciometro;
+      tempo.textContent = dados.tempo_aberto_ms;
+
+      const tempoAnimacao = dados.tempo_aberto_ms || 1000; // tempo em ms, com fallback
+
+      if (modo.textContent !== dados.modo) {
+        modo.textContent = dados.modo;
+        destacarElemento(modo, tempoAnimacao);
+      }
+
+      if (evento.textContent !== dados.evento) {
+        evento.textContent = dados.evento;
+        destacarElemento(evento, tempoAnimacao);
+      }
+    }
+
+
+    
+    function mostrarNotificacaoGIF() {
+      const animacao = document.getElementById("animacaoRacao");
+      animacao.style.display = "block";
+    }
+
+
+    function esconderNotificacaoGIF() {
+      const animacao = document.getElementById("animacaoRacao");
+      animacao.style.display = "none";
+    }
+
+	
+
+    async function fetchDados() {
+      const res = await fetch(firebaseUrl + "estado.json");
+      const dados = await res.json();
+
+      atualizarDashboard(dados);
+
+      const evento = (dados.evento || "").toLowerCase();
+      const ehAbertura = evento.includes("abertura");
+      const ehMonitoramento = evento.includes("monitoramento");
+
+      // Se o evento mudou
+      if (evento !== ultimoEvento) {
+        ultimoEvento = evento;
+        gerarRelatorioComDados(dados);
+
+        // Mostra o GIF apenas quando começa uma abertura
+        if (ehAbertura) {
+          mostrarNotificacaoGIF(dados.tempo_aberto_ms || 5000);
+        }
+
+        // Esconde o GIF se voltou para monitoramento
+        if (ehMonitoramento) {
+          esconderNotificacaoGIF();
+        }
+      }
+
+  return dados;
+}
+
+    function mostrarAba(abaId) {
+      // Oculta todas as abas
+      document.querySelectorAll('.abaRelatorio').forEach(div => {
+        div.style.display = 'none';
+      });
+
+      // Remove destaque de todos os botões
+      document.querySelectorAll('.abaBtn').forEach(btn => {
+        btn.classList.remove('ativo');
+      });
+
+      // Mostra a aba clicada
+      const abaSelecionada = document.getElementById(abaId);
+      if (abaSelecionada) {
+        abaSelecionada.style.display = 'block';
+      }
+
+      // Adiciona destaque ao botão correto via data-aba
+      const botaoSelecionado = document.querySelector(`.abaBtn[data-aba="${abaId}"]`);
+      if (botaoSelecionado) {
+        botaoSelecionado.classList.add('ativo');
+      }
+    }
+
+
+    function alternarSobre() {
+      const sobre = document.getElementById('sobreDashboard');
+      const relatorio = document.getElementById('relatorioContainer');
+      sobre.classList.toggle('mostrar');
+      relatorio.classList.remove('mostrar');
+      if (sobre.classList.contains('mostrar')) {
+        sobre.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    function alternarRelatorio() {
+      const relatorio = document.getElementById('relatorioContainer');
+      const sobre = document.getElementById('sobreDashboard');
+      relatorio.classList.toggle('mostrar');
+      sobre.classList.remove('mostrar');
+      if (relatorio.classList.contains('mostrar')) {
+        relatorio.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    function gerarRelatorioComDados(dados) {
+      const evento = dados.evento?.toLowerCase() || "";
+      let aba = "";
+
+      if (evento.includes("firebase")) aba = "firebase";
+      else if (evento.includes("botão") || evento.includes("botao")) aba = "botao";
+      else if (evento.includes("sensor")) aba = "sensor";
+      else return;
+
+      const container = document.getElementById(aba);
+      const novoItem = document.createElement("div");
+      novoItem.classList.add("relatorioItem");
+      novoItem.innerHTML = `
+        <ul>
+          <li><strong>Data:</strong> ${new Date().toLocaleString()}</li>
+          <li><strong>Distância:</strong> ${dados.distancia_cm} cm</li>
+          <li><strong>Potenciômetro:</strong> ${dados.potenciometro}</li>
+          <li><strong>Tempo de Abertura:</strong> ${dados.tempo_aberto_ms} ms</li>
+          <li><strong>Modo:</strong> ${dados.modo}</li>
+          <li><strong>Evento:</strong> ${dados.evento}</li>
+        </ul>
+      `;
+      container.prepend(novoItem);
+    }
+
+    async function gerarRelatorio() {
+      const dados = await fetchDados();
+      gerarRelatorioComDados(dados);
+    }
+
+    setInterval(fetchDados, 2000);
+
+    // Scroll sincronizado + gif animado por scroll
+    const gif = document.getElementById("scrollGif");
+    const totalFrames = 37;
+    const scrollTexto = document.querySelector(".sobreTextoBox");
+    const scrollGifContainer = document.getElementById("scrollGifContainer");
+
+    // Pré-carrega os 37 frames
+    const frameCache = [];
+    for (let i = 1; i <= totalFrames; i++) {
+      const nomeArquivo = `Embarcados2/data/frames/frame (${i}).gif`;
+      const urlGitHub = `https://joaopnobrega.github.io/PetFeeder-Front/${encodeURIComponent(nomeArquivo)}`;
+      const img = new Image();
+      img.src = urlGitHub;
+      frameCache.push(img);
+    }
+
+
+    function syncScroll(e) {
+      const source = e.target;
+      const target = source === scrollTexto ? scrollGifContainer : scrollTexto;
+
+      target.scrollTop = source.scrollTop;
+
+      const percent = source.scrollTop / (source.scrollHeight - source.clientHeight);
+      const frameIndex = Math.min(totalFrames - 1, Math.floor(percent * totalFrames));
+
+      const nomeArquivo = `Embarcados2/data/frames/frame (${frameIndex + 1}).gif`;
+      const urlGitHub = `https://joaopnobrega.github.io/PetFeeder-Front/${encodeURIComponent(nomeArquivo)}`;
+      gif.src = urlGitHub;
+    }
+
+
+
+    function toggleFadeEffect() {
+      const fade = document.getElementById("fadeEffect");
+      const scrollable = scrollTexto;
+
+      const atBottom = scrollable.scrollTop + scrollable.clientHeight >= scrollable.scrollHeight - 1;
+      if (atBottom) {
+        fade.classList.add("hidden");
+      } else {
+        fade.classList.remove("hidden");
+      }
+    }
+
+
+    scrollTexto.addEventListener("scroll", (event) => {
+      syncScroll(event);
+      toggleFadeEffect(); // mostra ou esconde o blur
+    });
+
+    scrollGifContainer.addEventListener("scroll", syncScroll);
+    window.addEventListener("load", toggleFadeEffect);
+  
+
+// Animação de fade-in com IntersectionObserver
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add("visible");
+    }
+  });
+}, {
+  root: scrollTexto,
+  threshold: 0.1
+});
+
+document.querySelectorAll('.sobreTextoBox p').forEach(p => {
+  observer.observe(p);
+});
+
+
+
+</script>
+
+<div id="animacaoRacao" style="display:none; position: fixed; top: 100px; right: 20px; z-index: 999; width: 180px; border-radius: 12px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.3); pointer-events: none;">
+  <div class="tenor-gif-embed"
+       data-postid="1745012748969606150"
+       data-share-method="host"
+       data-aspect-ratio="1.36364"
+       data-width="100%">
+    <a href="https://tenor.com/view/kitty-hello-street-cat-mr-fear-tgb-the-gluttonous-beast-gif-1745012748969606150">
+      Kitty Hello Street Cat GIF
+    </a>
+    from <a href="https://tenor.com/search/kitty-gifs">Kitty GIFs</a>
+  </div>
+</div>
+
+<script type="text/javascript" async src="https://tenor.com/embed.js"></script>
+
+
+</div></body></html>
