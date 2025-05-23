@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard PetFeeder</title>
+  <style>
+    :root {
+      --bg-primary: #0a0a0a;
+      --bg-secondary: #111111;
+      --card-bg: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+      --text-primary: #ffffff;
+      --text-secondary: #cccccc;
+      --text-muted: #888888;
+      --accent-green: #00ff88;
+      --accent-blue: #00aaff;
+      --accent-red: #ff4444;
+      --accent-yellow: #ffaa00;
+      --border-color: rgba(255, 255, 255, 0.1);
+      --shadow-dark: 0 8px 32px rgba(0, 0, 0, 0.6);
+      --shadow-glow: 0 0 20px rgba(0, 255, 136, 0.3);
+      --blur-bg: rgba(0, 0, 0, 0.8);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* Animated background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 20% 20%, rgba(0, 255, 136, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(0, 170, 255, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 40% 60%, rgba(255, 68, 68, 0.03) 0%, transparent 50%);
+      z-index: -1;
+      animation: backgroundPulse 10s ease-in-out infinite alternate;
+    }
+
+    @keyframes backgroundPulse {
+      0% { opacity: 0.3; }
+      100% { opacity: 0.7; }
+    }
+
+    /* Header aprimorado */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: var(--blur-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-color);
+      padding: 1.5rem 2rem;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-blue) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 0 0 30px rgba(0, 255, 136, 0.5);
+      letter-spacing: -0.02em;
+    }
+
+    /* Container principal cinematográfico */
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 3rem 2rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+
+    /* Cards redesenhados */
+    .card {
+      background: var(--card-bg);
+      border-radius: 24px;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-dark);
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent-green), var(--accent-blue), var(--accent-green));
+      background-size: 200% 100%;
+      animation: shimmer 3s ease-in-out infinite;
+    }
+
+    @keyframes shimmer {
+      0%, 100% { background-position: -200% 0; }
+      50% { background-position: 200% 0; }
+    }
+
+    .card:hover {
+      transform: translateY(-8px);
+      box-shadow: var(--shadow-dark), var(--shadow-glow);
+      border-color: var(--accent-green);
+    }
+
+    .card h3 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .card h3::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      background: var(--accent-green);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--accent-green);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(1.2); }
+    }
+
+    /* Controles aprimorados */
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    button {
+      background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      color: var(--text-primary);
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 500;
+      padding: 1rem 1.5rem;
+      position: relative;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      transition: left 0.5s ease;
+    }
+
+    button:hover::before {
+      left: 100%;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent-green);
+      box-shadow: 0 8px 25px rgba(0, 255, 136, 0.2);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    /* Botão primário especial */
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-green) 0%, #00cc70 100%);
+      border-color: var(--accent-green);
+      box-shadow: 0 4px 15px rgba(0, 255, 136, 0.3);
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 8px 30px rgba(0, 255, 136, 0.5);
+      transform: translateY(-3px);
+    }
+
+    /* Range slider moderno */
+    input[type="range"] {
+      width: 100%;
+      height: 8px;
+      border-radius: 4px;
+      background: linear-gradient(90deg, #333 0%, var(--accent-green) 100%);
+      outline: none;
+      -webkit-appearance: none;
+      margin: 1rem 0;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--accent-green);
+      cursor: pointer;
+      border: 2px solid #fff;
+      box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--accent-green);
+      cursor: pointer;
+      border: 2px solid #fff;
+      box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+    }
+
+    #tempoLabel {
+      text-align: center;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--accent-green);
+      margin-top: 0.5rem;
+    }
+
+    /* Dados dashboard aprimorados */
+    .dados-grid {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .dado-item {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 1.25rem;
+      border: 1px solid var(--border-color);
+      transition: all 0.3s ease;
+    }
+
+    .dado-item:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: var(--accent-green);
+    }
+
+    .dado-item strong {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .dado-item span {
+      color: var(--text-primary);
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+
+    .destaque-verde {
+      color: var(--accent-green) !important;
+      animation: highlight 2s ease-in-out;
+    }
+
+    @keyframes highlight {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; transform: scale(1.05); }
+    }
+
+    /* Seção de relatórios aprimorada */
+    #relatorioContainer {
+      grid-column: span 2;
+      background: var(--card-bg);
+      border-radius: 24px;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-dark);
+      padding: 2rem;
+      display: none;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    #relatorioContainer.mostrar {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .abaBtns-container {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 16px;
+      padding: 0.5rem;
+    }
+
+    .abaBtn {
+      flex: 1;
+      margin: 0;
+      background: transparent;
+      border: none;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+    }
+
+    .abaBtn.ativo {
+      background: linear-gradient(135deg, var(--accent-green) 0%, #00cc70 100%);
+      box-shadow: 0 4px 15px rgba(0, 255, 136, 0.3);
+    }
+
+    .relatorioItem {
+      background: linear-gradient(135deg, #1a1a1a 0%, #252525 100%);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      margin-bottom: 1.5rem;
+      padding: 1.5rem;
+      position: relative;
+      animation: slideInUp 0.6s ease-out;
+      transition: all 0.3s ease;
+    }
+
+    .relatorioItem:hover {
+      border-color: var(--accent-green);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    }
+
+    @keyframes slideInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .botaoExcluir {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: rgba(255, 68, 68, 0.2);
+      border: 1px solid var(--accent-red);
+      border-radius: 8px;
+      color: var(--accent-red);
+      font-size: 1.2rem;
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .botaoExcluir:hover {
+      background: var(--accent-red);
+      color: white;
+    }
+
+    /* Sobre o Dashboard - já estava bom, só pequenos ajustes */
+    #sobreDashboard {
+      display: none;
+      grid-column: span 2;
+      background: var(--bg-primary);
+      border-radius: 24px;
+      padding: 0;
+      min-height: 400px;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow: hidden;
+    }
+
+    #sobreDashboard.mostrar {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Seções cinematográficas */
+    .secao-cinematica {
+      display: flex;
+      align-items: center;
+      min-height: 100vh;
+      position: relative;
+      padding: 4rem 3rem;
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+      margin-bottom: 2rem;
+      border-radius: 24px;
+      overflow: hidden;
+    }
+
+    .secao-cinematica:last-child {
+      margin-bottom: 0;
+    }
+
+    .secao-cinematica.invertida {
+      flex-direction: row-reverse;
+      background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+    }
+
+    .conteudo-texto {
+      flex: 1;
+      padding: 2rem;
+      z-index: 2;
+      opacity: 0 !important;
+      filter: blur(10px) !important;
+      transform: translateY(50px) !important;
+      transition: opacity 0.5s ease, filter 0.5s ease, transform 0.5s ease;
+    }
+    
+    .conteudo-texto.visible {
+      opacity: 1 !important;
+      filter: blur(0px) !important;
+      transform: translateY(0) !important;
+    }
+
+    .conteudo-texto h2 {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 2rem;
+      background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-blue) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.2;
+      text-shadow: 0 4px 8px rgba(0,0,0,0.5);
+    }
+
+    .conteudo-texto p {
+      font-size: 1.2rem;
+      line-height: 1.8;
+      color: var(--text-secondary);
+      margin-bottom: 1.5rem;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .conteudo-midia {
+      flex: 1;
+      position: relative;
+      height: 600px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1;
+    }
+
+    .frame-scroll-container {
+      position: relative;
+      max-width: 500px;
+      width: 100%;
+      border-radius: 20px;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.7);
+      border: 2px solid var(--border-color);
+      overflow: hidden;
+      background: #000;
+      aspect-ratio: 16/9;
+    }
+
+    .frame-scroll {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: opacity 0.1s ease;
+    }
+
+    .secao-cinematica::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.4) 100%);
+      z-index: 1;
+    }
+
+    /* Navegação aprimorada */
+    .navegacao-secoes {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      padding: 2rem;
+      background: var(--blur-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 20px;
+      margin-bottom: 2rem;
+      position: sticky;
+      top: 100px;
+      z-index: 90;
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-secao {
+      padding: 1rem 2rem;
+      font-size: 1rem;
+      font-weight: 500;
+      border-radius: 16px;
+      border: 1px solid var(--border-color);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-secao.ativo {
+      background: linear-gradient(135deg, var(--accent-green) 0%, #00cc70 100%);
+      border-color: var(--accent-green);
+      color: #fff;
+      box-shadow: 0 8px 25px rgba(0, 255, 136, 0.4);
+    }
+
+    .btn-secao:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    /* Indicador de progresso aprimorado */
+    .progress-indicator {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: rgba(255,255,255,0.1);
+      z-index: 1001;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-green), var(--accent-blue));
+      width: 0%;
+      transition: width 0.1s ease;
+      box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+    }
+
+    .secao-conteudo {
+      display: none;
+      animation: fadeInUp 0.8s ease-out;
+    }
+
+    .secao-conteudo.ativa {
+      display: block;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Notificação GIF aprimorada */
+    #animacaoRacao {
+      position: fixed;
+      top: 120px;
+      right: 2rem;
+      width: 200px;
+      z-index: 9999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.6s ease, transform 0.6s ease;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+      border: 2px solid var(--accent-green);
+      transform: translateX(100px);
+    }
+
+    #animacaoRacao.mostrar {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    /* Frame counter aprimorado */
+    .frame-counter {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--blur-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border-color);
+      color: var(--accent-green);
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+      z-index: 1000;
+      display: none;
+    }
+
+    /* Responsividade aprimorada */
+    @media (max-width: 768px) {
+      .container {
+        grid-template-columns: 1fr;
+        padding: 2rem 1rem;
+        gap: 1.5rem;
+      }
+
+      header h1 {
+        font-size: 2rem;
+      }
+
+      .secao-cinematica {
+        flex-direction: column;
+        text-align: center;
+        padding: 2rem 1.5rem;
+      }
+
+      .secao-cinematica.invertida {
+        flex-direction: column;
+      }
+
+      .conteudo-texto h2 {
+        font-size: 2.2rem;
+      }
+
+      .navegacao-secoes {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .abaBtns-container {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+    }
+
+    /* Animações de entrada */
+    .card {
+      animation: slideInUp 0.6s ease-out forwards;
+    }
+
+    .card:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    @keyframes slideInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Indicador de progresso -->
+  <div class="progress-indicator">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+  <!-- Frame counter para debug -->
+  <div class="frame-counter" id="frameCounter">
+    Frame: 1 / Total: 37
+  </div>
+
+  <header>
+    <h1>PetFeeder Dashboard</h1>
+  </header>
+
+  <div class="container">
+    <div class="card"> 
+      <h3>🎮 Controle Remoto</h3>
+      <div class="controls">
+        <button onclick="abrirPorta()" class="btn-primary">🚪 Abrir PetFeeder</button>
+        <label for="tempoRange">⏱️ Tempo de Abertura (ms)</label>
+        <input type="range" id="tempoRange" min="1000" max="10000" step="1000" value="5000">
+        <div id="tempoLabel">5000 ms</div>
+        <button onclick="definirTempo()">⚙️ Definir Tempo</button>
+        <div style="display: flex; gap: 1rem;">
+          <button onclick="alternarRelatorio()" class="abaBtn">📊 Ver Relatório</button>
+          <button onclick="alternarSobre()" class="abaBtn">ℹ️ Sobre o Dashboard</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>📡 Últimos Dados</h3>
+      <div class="dados-grid">
+        <div class="dado-item">
+          <strong>Distância</strong>
+          <span id="distancia">173.468</span> cm
+        </div>
+        <div class="dado-item">
+          <strong>Potenciômetro</strong>
+          <span id="pot">0</span>
+        </div>
+        <div class="dado-item">
+          <strong>Tempo Abertura</strong>
+          <span id="tempo">5000</span> ms
+        </div>
+        <div class="dado-item">
+          <strong>Modo</strong>
+          <span id="modo" class="">firebase</span>
+        </div>
+        <div class="dado-item">
+          <strong>Evento</strong>
+          <span id="evento" class="">Monitoramento contínuo</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="relatorioContainer" class="mostrar">
+      <h3>📊 Relatórios Gerados</h3>
+      <div class="abaBtns-container">
+        <button onclick="mostrarAba('firebase')" class="abaBtn ativo" data-aba="firebase">🌐 Firebase</button>
+        <button onclick="mostrarAba('botao')" class="abaBtn" data-aba="botao">🖱️ Botão</button>
+        <button onclick="mostrarAba('sensor')" class="abaBtn" data-aba="sensor">📡 Sensor</button>
+      </div>
+
+      <div id="firebase" class="abaRelatorio" style="display: block;"></div>
+      <div id="botao" class="abaRelatorio" style="display: none;"></div>
+      <div id="sensor" class="abaRelatorio" style="display: none;"></div>
+    </div>
+
+    <div id="sobreDashboard" class="">
+      <!-- Navegação -->
+      <div class="navegacao-secoes">
+        <button onclick="mostrarSecao('prototipo')" class="btn-secao ativo" data-secao="prototipo">🔧 Protótipo</button>
+        <button onclick="mostrarSecao('versaoFinal')" class="btn-secao" data-secao="versaoFinal">🚀 Versão Final</button>
+      </div>
+
+      <!-- Seção Protótipo -->
+      <div id="secao-prototipo" class="secao-conteudo ativa">
+        <div class="secao-cinematica" data-frames="37" data-base-url="https://joaopnobrega.github.io/PetFeeder-Front/Embarcados2/data/frames/frame%20">
+          <div class="conteudo-texto">
+            <h2>Protótipo</h2>
+            <p>O foco do projeto foi cumprir os requisitos da disciplina de Sistemas Embarcados. Começamos com um sensor PIR, mas trocamos por um ultrassônico mais preciso.</p>
+            <p>O potenciômetro controla a quantidade de ração, e um LED indica a abertura do alimentador. Enfrentamos problemas com fios defeituosos e um curto inicial, o que reforçou a importância da organização.</p>
+            <p>Finalizamos com a integração do Firebase para controle remoto e registro dos dados.</p>
+          </div>
+          <div class="conteudo-midia">
+            <div class="frame-scroll-container">
+              <img id="frame-prototipo" class="frame-scroll" 
+                   src="https://joaopnobrega.github.io/PetFeeder-Front/Embarcados2/data/frames/frame%20(1).gif" 
+                   alt="Protótipo PetFeeder">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Seção Versão Final -->
+      <div id="secao-versaoFinal" class="secao-conteudo">
+        <div class="secao-cinematica invertida" data-frames="27" data-base-url="https://joaopnobrega.github.io/PetFeeder-Front/Embarcados2/data/frames/frame_final%20">
+          <div class="conteudo-texto">
+            <h2>Versão Final</h2>
+            <p>O visual final do nosso projeto ficou bem próximo do que imaginávamos, com um toque artesanal. Inicialmente, a ideia era utilizar impressão 3D, mas o tempo era nosso maior inimigo.</p>
+            <p>Optamos, então, por usar papelão — que cumpriu a função da mesma forma. A estrutura é composta por uma caixa com uma rampa e um portão que abre e fecha (controlado por um motor servo), além de um sensor na parte frontal para detectar a presença do animal.</p>
+            <p>Na versão final, decidimos deixar visíveis apenas o potenciômetro e o sensor ultrassônico.</p>
+          </div>
+          <div class="conteudo-midia">
+            <div class="frame-scroll-container">
+              <img id="frame-versaoFinal" class="frame-scroll" 
+                   src="https://joaopnobrega.github.io/PetFeeder-Front/Embarcados2/data/frames/frame_final%20(1).gif" 
+                   alt="Versão Final PetFeeder">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Notificação GIF -->
+  <div id="animacaoRacao" style="display:none;">
+    <div class="
+
+    <!-- Notificação GIF -->
+  <div id="animacaoRacao" style="display:none;">
+    <div class="tenor-gif-embed"
+         data-postid="1745012748969606150"
+         data-share-method="host"
+         data-aspect-ratio="1.36364"
+         data-width="100%">
+      <a href="https://tenor.com/view/kitty-hello-street-cat-mr-fear-tgb-the-gluttonous-beast-gif-1745012748969606150">
+        Kitty Hello Street Cat GIF
+      </a>
+      from <a href="https://tenor.com/search/kitty-gifs">Kitty GIFs</a>
+    </div>
+  </div>
+
+  <script type="text/javascript" async src="https://tenor.com/embed.js"></script>
+
+  <script>
+    const firebaseUrl = "https://petfeed-se-default-rtdb.firebaseio.com/";
+    let ultimoEvento = null;
+
+    // Sistema de scroll sincronizado
+    let frameScrollSystems = [];
+
+    class FrameScrollSystem {
+      constructor(element, totalFrames, baseUrl) {
+        this.element = element;
+        this.totalFrames = totalFrames;
+        this.baseUrl = baseUrl;
+        this.currentFrame = 1;
+        this.isActive = false;
+        
+        // Preload algumas imagens
+        this.preloadFrames();
+      }
+
+      preloadFrames() {
+        for (let frameNum = 1; frameNum <= this.totalFrames; frameNum += 20) {
+          const img = new Image();
+          img.src = `${this.baseUrl}(${frameNum}).gif`;
+        }
+      }
+
+      updateFrame(scrollProgress) {
+        if (!this.isActive) return;
+        
+        // Converte o progresso do scroll (0-1) para o número do frame
+        const frameNumber = Math.max(1, Math.min(this.totalFrames, Math.floor(scrollProgress * this.totalFrames) + 1));
+        
+        if (frameNumber !== this.currentFrame) {
+          this.currentFrame = frameNumber;
+          const newSrc = `${this.baseUrl}(${frameNumber}).gif`;
+          
+          // Só atualiza se a imagem for diferente
+          if (this.element.src !== newSrc) {
+            this.element.src = newSrc;
+            
+            // Atualiza counter para debug
+            const counter = document.getElementById('frameCounter');
+            if (counter) {
+              counter.textContent = `Frame: ${frameNumber} / Total: ${this.totalFrames}`;
+            }
+          }
+        }
+      }
+
+      activate() {
+        this.isActive = true;
+      }
+
+      deactivate() {
+        this.isActive = false;
+      }
+    }
+
+    function initFrameScrollSystems() {
+      // Sistema para protótipo
+      const prototipoImg = document.getElementById('frame-prototipo');
+      const prototipoSystem = new FrameScrollSystem(
+        prototipoImg, 
+        37, 
+        'https://joaopnobrega.github.io/PetFeeder-Front/Embarcados2/data/frames/frame%20'
+      );
+
+      // Sistema para versão final
+      const versaoFinalImg = document.getElementById('frame-versaoFinal');
+      const versaoFinalSystem = new FrameScrollSystem(
+        versaoFinalImg, 
+        27, 
+        'https://joaopnobrega.github.io/PetFeeder-Front/Embarcados2/data/frames/frame_final%20'
+      );
+
+      frameScrollSystems = [
+        { id: 'prototipo', system: prototipoSystem },
+        { id: 'versaoFinal', system: versaoFinalSystem }
+      ];
+    }
+
+    function handleScroll() {
+      const activeSection = document.querySelector('.secao-conteudo.ativa');
+      if (!activeSection) return;
+
+      const cinematicSection = activeSection.querySelector('.secao-cinematica');
+      if (!cinematicSection) return;
+
+      const scrollY = window.scrollY + window.innerHeight / 2;
+      const sectionTop = cinematicSection.offsetTop;
+      const sectionHeight = cinematicSection.offsetHeight;
+
+      let scrollProgress = (scrollY - sectionTop) / sectionHeight;
+      scrollProgress = Math.max(0, Math.min(1, scrollProgress));
+
+      // Atualiza a barra de progresso
+      const progressBar = document.getElementById('progressBar');
+      if (progressBar) {
+        progressBar.style.width = `${scrollProgress * 100}%`;
+      }
+
+      // Controla o texto baseado no scroll
+      const conteudoTexto = cinematicSection.querySelector('.conteudo-texto');
+      if (conteudoTexto) {
+        if (scrollProgress > 0.2) {
+          conteudoTexto.classList.add('visible');
+        } else {
+          conteudoTexto.classList.remove('visible');
+        }
+      }
+
+      // Encontra o sistema ativo e atualiza frames
+      const activeSectionId = activeSection.id.replace('secao-', '');
+      const activeFrameSystem = frameScrollSystems.find(fs => fs.id === activeSectionId);
+      
+      if (activeFrameSystem) {
+        frameScrollSystems.forEach(fs => {
+          if (fs.id === activeSectionId) {
+            fs.system.activate();
+            fs.system.updateFrame(scrollProgress);
+          } else {
+            fs.system.deactivate();
+          }
+        });
+      }
+    }
+
+    function destacarElemento(el, duracao) {
+      el.classList.add("destaque-verde");
+      setTimeout(() => el.classList.remove("destaque-verde"), duracao || 1000);
+    }
+
+    document.getElementById("tempoRange").addEventListener("input", function () {
+      document.getElementById("tempoLabel").textContent = `${this.value} ms`;
+    });
+
+    function excluirRelatorio(btn) {
+      const item = btn.closest(".relatorioItem");
+      if (item) item.remove();
+    }
+
+    function gerarRelatorioComDados(dados) {
+      const evento = dados.evento?.toLowerCase() || "";
+      let aba = "";
+
+      if (evento.includes("firebase")) aba = "firebase";
+      else if (evento.includes("botão") || evento.includes("botao")) aba = "botao";
+      else if (evento.includes("sensor")) aba = "sensor";
+      else return;
+
+      const container = document.getElementById(aba);
+      const novoItem = document.createElement("div");
+      novoItem.classList.add("relatorioItem");
+      novoItem.innerHTML = `
+        <button class="botaoExcluir" onclick="excluirRelatorio(this)">&#x2715;</button>
+        <ul>
+          <li><strong>Data:</strong> ${new Date().toLocaleString()}</li>
+          <li><strong>Distância:</strong> ${dados.distancia_cm} cm</li>
+          <li><strong>Potenciômetro:</strong> ${dados.potenciometro}</li>
+          <li><strong>Tempo de Abertura:</strong> ${dados.tempo_aberto_ms} ms</li>
+          <li><strong>Modo:</strong> ${dados.modo}</li>
+          <li><strong>Evento:</strong> ${dados.evento}</li>
+        </ul>
+      `;
+      container.prepend(novoItem);
+    }
+
+    async function abrirPorta() {
+      const tempo = parseInt(document.getElementById("tempoRange").value);
+
+      await fetch(firebaseUrl + "comando/abrir.json", {
+        method: "PUT",
+        body: "true"
+      });
+
+      // Mostra notificação visual aprimorada
+      const animacao = document.getElementById("animacaoRacao");
+      animacao.classList.add('mostrar');
+      
+      setTimeout(() => {
+        animacao.classList.remove('mostrar');
+      }, tempo);
+
+      // Efeito sonoro simulado com vibração no mobile
+      if (navigator.vibrate) {
+        navigator.vibrate([200, 100, 200]);
+      }
+
+      // Notification API se disponível
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification('PetFeeder Ativado!', {
+          body: `Alimentador será aberto por ${tempo}ms`,
+          icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%2300ff88"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>'
+        });
+      }
+
+      alert("✅ PetFeeder será aberto");
+    }
+
+    async function definirTempo() {
+      const tempo = parseInt(document.getElementById("tempoRange").value);
+      await fetch(firebaseUrl + "comando/tempo_remoto_ms.json", {
+        method: "PUT",
+        body: tempo.toString()
+      });
+      
+      // Feedback visual aprimorado
+      const tempoLabel = document.getElementById("tempoLabel");
+      const originalText = tempoLabel.textContent;
+      tempoLabel.textContent = "✅ Definido!";
+      tempoLabel.style.color = "var(--accent-green)";
+      
+      setTimeout(() => {
+        tempoLabel.textContent = originalText;
+        tempoLabel.style.color = "";
+      }, 2000);
+
+      alert(`✅ Tempo definido: ${tempo} ms`);
+    }
+
+    function atualizarDashboard(dados) {
+      const distancia = document.getElementById('distancia');
+      const pot = document.getElementById('pot');
+      const tempo = document.getElementById('tempo');
+      const modo = document.getElementById('modo');
+      const evento = document.getElementById('evento');
+
+      // Animação suave nos valores que mudaram
+      if (distancia.textContent !== dados.distancia_cm.toString()) {
+        distancia.textContent = dados.distancia_cm;
+        destacarElemento(distancia.parentElement, 2000);
+      }
+
+      if (pot.textContent !== dados.potenciometro.toString()) {
+        pot.textContent = dados.potenciometro;
+        destacarElemento(pot.parentElement, 2000);
+      }
+
+      if (tempo.textContent !== dados.tempo_aberto_ms.toString()) {
+        tempo.textContent = dados.tempo_aberto_ms;
+        destacarElemento(tempo.parentElement, 2000);
+      }
+
+      const tempoAnimacao = dados.tempo_aberto_ms || 1000;
+
+      if (modo.textContent !== dados.modo) {
+        modo.textContent = dados.modo;
+        destacarElemento(modo.parentElement, tempoAnimacao);
+      }
+
+      if (evento.textContent !== dados.evento) {
+        evento.textContent = dados.evento;
+        destacarElemento(evento.parentElement, tempoAnimacao);
+      }
+    }
+
+    function mostrarNotificacaoGIF(duracao = 5000) {
+      const animacao = document.getElementById("animacaoRacao");
+      animacao.style.display = "block";
+      animacao.classList.add('mostrar');
+      
+      setTimeout(() => {
+        animacao.classList.remove('mostrar');
+        setTimeout(() => {
+          animacao.style.display = "none";
+        }, 600);
+      }, duracao);
+    }
+
+    function esconderNotificacaoGIF() {
+      const animacao = document.getElementById("animacaoRacao");
+      animacao.classList.remove('mostrar');
+      setTimeout(() => {
+        animacao.style.display = "none";
+      }, 600);
+    }
+
+    async function fetchDados() {
+      try {
+        const res = await fetch(firebaseUrl + "estado.json");
+        const dados = await res.json();
+
+        atualizarDashboard(dados);
+
+        const evento = (dados.evento || "").toLowerCase();
+        const ehAbertura = evento.includes("abertura");
+        const ehMonitoramento = evento.includes("monitoramento");
+
+        if (evento !== ultimoEvento) {
+          ultimoEvento = evento;
+          gerarRelatorioComDados(dados);
+
+          if (ehAbertura) {
+            mostrarNotificacaoGIF(dados.tempo_aberto_ms || 5000);
+          }
+
+          if (ehMonitoramento) {
+            esconderNotificacaoGIF();
+          }
+        }
+
+        return dados;
+      } catch (error) {
+        console.error('Erro ao buscar dados:', error);
+        // Feedback visual de erro
+        const evento = document.getElementById('evento');
+        evento.textContent = 'Erro de conexão';
+        evento.style.color = 'var(--accent-red)';
+      }
+    }
+
+    function mostrarAba(abaId) {
+      document.querySelectorAll('.abaRelatorio').forEach(div => {
+        div.style.display = 'none';
+      });
+
+      document.querySelectorAll('.abaBtn').forEach(btn => {
+        btn.classList.remove('ativo');
+      });
+
+      const abaSelecionada = document.getElementById(abaId);
+      if (abaSelecionada) {
+        abaSelecionada.style.display = 'block';
+      }
+
+      const botaoSelecionado = document.querySelector(`.abaBtn[data-aba="${abaId}"]`);
+      if (botaoSelecionado) {
+        botaoSelecionado.classList.add('ativo');
+      }
+    }
+
+    function mostrarSecao(secaoId) {
+      document.querySelectorAll('.secao-conteudo').forEach(div => {
+        div.classList.remove('ativa');
+      });
+
+      document.querySelectorAll('.btn-secao').forEach(btn => {
+        btn.classList.remove('ativo');
+      });
+
+      const secaoSelecionada = document.getElementById(`secao-${secaoId}`);
+      if (secaoSelecionada) {
+        secaoSelecionada.classList.add('ativa');
+      }
+
+      const botaoSelecionado = document.querySelector(`.btn-secao[data-secao="${secaoId}"]`);
+      if (botaoSelecionado) {
+        botaoSelecionado.classList.add('ativo');
+      }
+
+      // Força uma atualização do scroll após trocar de seção
+      setTimeout(handleScroll, 100);
+    }
+
+    function alternarSobre() {
+      const sobre = document.getElementById('sobreDashboard');
+      const relatorio = document.getElementById('relatorioContainer');
+      sobre.classList.toggle('mostrar');
+      relatorio.classList.remove('mostrar');
+      
+      if (sobre.classList.contains('mostrar')) {
+        sobre.scrollIntoView({ behavior: 'smooth' });
+        setTimeout(() => {
+          initFrameScrollSystems();
+          handleScroll();
+        }, 500);
+      }
+    }
+
+    function alternarRelatorio() {
+      const relatorio = document.getElementById('relatorioContainer');
+      const sobre = document.getElementById('sobreDashboard');
+      relatorio.classList.toggle('mostrar');
+      sobre.classList.remove('mostrar');
+      if (relatorio.classList.contains('mostrar')) {
+        relatorio.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    async function gerarRelatorio() {
+      const dados = await fetchDados();
+      gerarRelatorioComDados(dados);
+    }
+
+    // Inicialização
+    document.addEventListener('DOMContentLoaded', function() {
+      // Solicita permissão para notificações
+      if ('Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission();
+      }
+
+      // Inicializa os sistemas de frame scroll
+      initFrameScrollSystems();
+
+      // Event listener para scroll otimizado
+      let ticking = false;
+      window.addEventListener('scroll', () => {
+        if (!ticking) {
+          requestAnimationFrame(() => {
+            handleScroll();
+            ticking = false;
+          });
+          ticking = true;
+        }
+      });
+
+      // Event listener para redimensionamento
+      window.addEventListener('resize', () => {
+        handleScroll();
+      });
+
+      // Mostra/esconde frame counter com tecla 'D' (debug)
+      document.addEventListener('keydown', (e) => {
+        if (e.key.toLowerCase() === 'd') {
+          const counter = document.getElementById('frameCounter');
+          counter.style.display = counter.style.display === 'none' ? 'block' : 'none';
+        }
+      });
+
+      // Easter egg - Konami Code
+      let konamiCode = [];
+      const konami = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65];
+      document.addEventListener('keydown', (e) => {
+        konamiCode.push(e.keyCode);
+        if (konamiCode.length > konami.length) {
+          konamiCode.shift();
+        }
+        if (konamiCode.join(',') === konami.join(',')) {
+          // Ativa modo festivo
+          document.body.style.animation = 'rainbow 2s infinite';
+          setTimeout(() => {
+            document.body.style.animation = '';
+          }, 10000);
+        }
+      });
+
+      // Animação de entrada para os cards
+      const cards = document.querySelectorAll('.card');
+      cards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(30px)';
+        setTimeout(() => {
+          card.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+          card.style.opacity = '1';
+          card.style.transform = 'translateY(0)';
+        }, index * 200);
+      });
+
+      // Atualização inicial dos dados
+      fetchDados();
+    });
+
+    // Intervalo para buscar dados do Firebase
+    setInterval(fetchDados, 2000);
+
+    // Service Worker para cache (se suportado)
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('data:text/javascript,').catch(() => {
+        // Silently fail if service worker is not supported
+      });
+    }
+
+    // CSS adicional para animações especiais
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes rainbow {
+        0% { filter: hue-rotate(0deg); }
+        100% { filter: hue-rotate(360deg); }
+      }
+      
+      @keyframes glow {
+        0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 136, 0.3); }
+        50% { box-shadow: 0 0 40px rgba(0, 255, 136, 0.8); }
+      }
+      
+      .card:hover::after {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        border-radius: 26px;
+        z-index: -1;
+        animation: glow 2s ease-in-out infinite;
+      }
+    `;
+    document.head.appendChild(style);
+
+  </script>
+
+</body>
+</html>
