@@ -6,7 +6,7 @@ Este repositório contém o código-fonte e a documentação do projeto PetFeede
 
 ## 📖 Sobre
 
-Um **PetFeeder** é um alimentador automático para animais de estimação. O objetivo deste projeto, criado pelo aluno **João P. Nóbrega**, foi desenvolver um sistema embarcado capaz de automatizar a tarefa de alimentar pets, utilizando um microcontrolador ESP32 e integrando-o a um dashboard web para monitoramento e controle.
+Um **PetFeeder** é um alimentador automático para animais de estimação. O objetivo deste projeto, criado por mim, foi desenvolver um sistema embarcado capaz de automatizar a tarefa de alimentar pets, utilizando um microcontrolador ESP32 e integrando-o a um dashboard web para monitoramento e controle.
 
 ---
 
