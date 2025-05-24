@@ -162,7 +162,6 @@ void enviarDadosParaFirebase(float distancia, int potValue, int tempo, const Str
   Firebase.setInt(fbdo, "/estado/tempo_aberto_ms", tempo);
   Firebase.setString(fbdo, "/estado/modo", modo);
   Firebase.setString(fbdo, "/estado/evento", evento); // Usa o 'evento' que é o mesmo 'currentStatus'
-  Serial.println("Dados enviados para Firebase.");
 }
 
 int brilhoInicial = 255;
