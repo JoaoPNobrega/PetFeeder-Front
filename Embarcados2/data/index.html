@@ -158,7 +158,7 @@
       position: absolute; top: 1rem; right: 1rem; background: rgba(255, 68, 68, 0.2);
       border: 1px solid var(--accent-red); border-radius: 8px; color: var(--accent-red);
       font-size: 1.2rem; width: 32px; height: 32px; padding: 0;
-      display: flex; align-items: center; justify-content: center;
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
     }
     .botaoExcluir:hover { background: var(--accent-red); color: white; }
 
@@ -378,34 +378,34 @@
      <div class="card">
       <h3>Controle Remoto</h3>
       <div class="controls">
-        <button onclick="abrirPorta()" class="btn-primary">Abrir PetFeeder</button>
+        <button id="btnAbrirPorta" class="btn-primary">Abrir PetFeeder</button>
         <label for="tempoRange">Tempo de Abertura (ms)</label>
         <input type="range" id="tempoRange" min="1000" max="10000" step="1000" value="5000">
         <div id="tempoLabel">5000 ms</div>
-        <button onclick="definirTempo()">Definir Tempo</button>
+        <button id="btnDefinirTempo">Definir Tempo</button>
         <div style="display: flex; gap: 1rem;">
-          <button onclick="alternarRelatorio()" class="abaBtn">Ver Relatório</button>
-          <button onclick="alternarSobre()" class="abaBtn">Sobre o Dashboard</button>
+          <button id="btnVerRelatorio" class="abaBtn">Ver Relatório</button>
+          <button id="btnSobreDashboard" class="abaBtn">Sobre o Dashboard</button>
         </div>
       </div>
     </div>
     <div class="card">
       <h3>Últimos Dados</h3>
       <div class="dados-grid">
-        <div class="dado-item"> <strong>Distância</strong> <span id="distancia">173.468</span> cm </div>
-        <div class="dado-item"> <strong>Potenciômetro</strong> <span id="pot">0</span> </div>
-        <div class="dado-item"> <strong>Tempo Abertura</strong> <span id="tempo">5000</span> ms </div>
-        <div class="dado-item"> <strong>Modo</strong> <span id="modo" class="">firebase</span> </div>
-        <div class="dado-item"> <strong>Evento</strong> <span id="evento" class="">Monitoramento contínuo</span> </div>
+        <div class="dado-item"> <strong>Distância</strong> <span id="distancia">--</span> cm </div>
+        <div class="dado-item"> <strong>Potenciômetro</strong> <span id="pot">--</span> </div>
+        <div class="dado-item"> <strong>Tempo Abertura</strong> <span id="tempo">--</span> ms </div>
+        <div class="dado-item"> <strong>Modo</strong> <span id="modo" class="">--</span> </div>
+        <div class="dado-item"> <strong>Evento</strong> <span id="evento" class="">Aguardando...</span> </div>
       </div>
     </div>
 
     <div id="relatorioContainer">
       <h3>Relatórios Gerados</h3>
       <div class="abaBtns-container">
-        <button onclick="mostrarAba('firebase')" class="abaBtn ativo" data-aba="firebase">Firebase</button>
-        <button onclick="mostrarAba('botao')" class="abaBtn" data-aba="botao">Botão</button>
-        <button onclick="mostrarAba('sensor')" class="abaBtn" data-aba="sensor">Sensor</button>
+        <button id="btnAbaFirebase" class="abaBtn ativo" data-aba="firebase">Firebase</button>
+        <button id="btnAbaBotao" class="abaBtn" data-aba="botao">Botão</button>
+        <button id="btnAbaSensor" class="abaBtn" data-aba="sensor">Sensor</button>
       </div>
       <div id="firebase" class="abaRelatorio" style="display: block;"></div>
       <div id="botao" class="abaRelatorio" style="display: none;"></div>
@@ -414,13 +414,13 @@
 
     <div id="sobreDashboard" class="">
       <div class="navegacao-secoes">
-        <button onclick="mostrarSecao('prototipo')" class="btn-secao ativo" data-secao="prototipo">Protótipo</button>
-        <button onclick="mostrarSecao('versaoFinal')" class="btn-secao" data-secao="versaoFinal">Versão Final</button>
-        <button onclick="mostrarSecao('requisitos')" class="btn-secao" data-secao="requisitos">Requisitos</button>
+         <button id="btnSecaoPrototipo" class="btn-secao ativo" data-secao="prototipo">Protótipo</button>
+         <button id="btnSecaoVersaoFinal" class="btn-secao" data-secao="versaoFinal">Versão Final</button>
+         <button id="btnSecaoRequisitos" class="btn-secao" data-secao="requisitos">Requisitos</button>
       </div>
 
        <div id="secao-prototipo" class="secao-conteudo ativa">
-        <div class="secao-cinematica" data-id="prototipo" data-frames="37" data-base-url="https://joaopnobrega.github.io/PetFeeder-Front/Embarcados2/data/frames/frame%20">
+         <div class="secao-cinematica" data-id="prototipo" data-frames="37" data-base-url="https://joaopnobrega.github.io/PetFeeder-Front/Embarcados2/data/frames/frame%20">
           <div class="conteudo-texto">
             <h2>Protótipo</h2>
             <p>O foco do projeto foi cumprir os requisitos da disciplina de Sistemas Embarcados. Começamos com um sensor PIR, mas trocamos por um ultrassônico mais preciso.</p>
@@ -435,7 +435,7 @@
       </div>
 
       <div id="secao-versaoFinal" class="secao-conteudo">
-        <div class="secao-cinematica invertida" data-id="versaoFinal" data-frames="38" data-base-url="https://joaopnobrega.github.io/PetFeeder-Front/Embarcados2/data/frames/frame_final%20">
+         <div class="secao-cinematica invertida" data-id="versaoFinal" data-frames="38" data-base-url="https://joaopnobrega.github.io/PetFeeder-Front/Embarcados2/data/frames/frame_final%20">
           <div class="conteudo-texto">
             <h2>Versão Final</h2>
             <p>O visual final do nosso projeto ficou bem próximo do que imaginávamos, com um toque artesanal. Inicialmente, a ideia era utilizar impressão 3D, mas o tempo era nosso maior inimigo.</p>
@@ -454,7 +454,6 @@
             <h1 style="font-size: 3rem; margin-bottom: 0.5rem; background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-blue) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-shadow: 0 0 30px rgba(0, 255, 136, 0.5);">REQUISITOS</h1>
             <h2 style="font-size: 1.5rem; color: var(--text-secondary); font-weight: 500;">Sistemas Embarcados 2025.1</h2>
         </div>
-
         <div class="secao-cinematica" data-frames="135" data-base-url="https://joaopnobrega.github.io/PetFeeder-Front/Embarcados2/data/frames/led%20" data-requirement-id="led">
             <div class="conteudo-texto">
                 <h3>Uso da LED (com PWM)</h3>
@@ -492,7 +491,6 @@ void atualizarServo() {
                 <div class="slider-vertical-container"> <input type="range" class="frame-slider-vertical" id="slider-req-led" min="1" max="135" value="1"> </div>
             </div>
         </div>
-
         <div class="secao-cinematica invertida" data-frames="75" data-base-url="https://joaopnobrega.github.io/PetFeeder-Front/Embarcados2/data/frames/botao%20" data-requirement-id="botao">
             <div class="conteudo-texto">
                 <h3>Uso do botão físico</h3>
@@ -517,7 +515,6 @@ void loop() {
                 <div class="slider-vertical-container"> <input type="range" class="frame-slider-vertical" id="slider-req-botao" min="1" max="75" value="1"> </div>
             </div>
         </div>
-
         <div class="secao-cinematica" data-frames="66" data-base-url="https://joaopnobrega.github.io/PetFeeder-Front/Embarcados2/data/frames/motor%20" data-requirement-id="motor">
             <div class="conteudo-texto">
                 <h3>Uso do servo motor</h3>
@@ -541,7 +538,6 @@ void acionarServoNaoBloqueante(int tempoEmMs) {
                 <div class="slider-vertical-container"> <input type="range" class="frame-slider-vertical" id="slider-req-motor" min="1" max="66" value="1"> </div>
             </div>
         </div>
-
         <div class="secao-cinematica invertida" data-frames="77" data-base-url="https://joaopnobrega.github.io/PetFeeder-Front/Embarcados2/data/frames/sensor%20" data-requirement-id="sensor">
             <div class="conteudo-texto">
                 <h3>Uso do sensor ultrassônico</h3>
@@ -574,7 +570,6 @@ void loop() {
                 <div class="slider-vertical-container"> <input type="range" class="frame-slider-vertical" id="slider-req-sensor" min="1" max="77" value="1"> </div>
             </div>
         </div>
-
         <div class="secao-cinematica" data-frames="93" data-base-url="https://joaopnobrega.github.io/PetFeeder-Front/Embarcados2/data/frames/pot%20" data-requirement-id="pot">
             <div class="conteudo-texto">
                 <h3>Uso do potenciômetro</h3>
@@ -618,7 +613,6 @@ void loop() {
                 <div class="slider-vertical-container"> <input type="range" class="frame-slider-vertical" id="slider-req-pot" min="1" max="93" value="1"> </div>
             </div>
         </div>
-
         <div class="secao-cinematica invertida static-text" data-requirement-id="firebase">
             <div class="conteudo-texto">
                 <h3>Uso do Firebase</h3>
@@ -650,7 +644,6 @@ void enviarDadosParaFirebase(float distancia, int potValue, int tempo, const Str
                 <div class="frame-scroll-container fixed-image-container"> <img id="img-req-firebase" class="frame-scroll fixed-image" src="https://joaopnobrega.github.io/PetFeeder-Front/Embarcados2/data/frames/firebase.png" alt="Requisito Firebase"> </div>
             </div>
         </div>
-
         <div class="secao-cinematica static-text" data-requirement-id="ap">
              <div class="conteudo-texto">
                 <h3>Criação do Wi-Fi próprio (Access Point)</h3>
@@ -683,7 +676,6 @@ void enviarDadosParaFirebase(float distancia, int potValue, int tempo, const Str
                 <div class="frame-scroll-container fixed-image-container"> <img id="img-req-ap" class="frame-scroll fixed-image" src="https://joaopnobrega.github.io/PetFeeder-Front/Embarcados2/data/frames/AP.jpeg" alt="Requisito Access Point"> </div>
             </div>
         </div>
-
         <div class="secao-cinematica invertida static-text" data-requirement-id="interfacehtml">
             <div class="conteudo-texto">
                 <h3>Interface HTML embutida no ESP32</h3>
@@ -743,24 +735,49 @@ async function abrir() {
   </div>
   <script type="text/javascript" async src="https://tenor.com/embed.js"></script>
 
-  <script>
-    const firebaseUrl = "https://petfeed-se-default-rtdb.firebaseio.com/";
-    let ultimoEvento = null;
-    let frameScrollSystems = [];
-    let requisitosObservers = [];
-    let pinnableObserver = null;
-    let activePinnableSection = null;
-    let requisitosScrollListenerActive = false;
-    let activeRequisitosScrollSystem = null;
-    let finalSectionActive = false;
+  <script type="module">
+     // Importa as funções necessárias do Firebase SDK (v9+)
+     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
+     // Importa o Realtime Database e suas funções
+     import { getDatabase, ref, set, onValue, push, remove } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-database.js";
+     // Opcional: Analytics (se quiser usar)
+     // import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-analytics.js";
 
-    const finalSectionElement = document.getElementById('secao-final');
-    const finalImageElement = document.getElementById('frame-final');
-    const finalTextOverlay = document.getElementById('final-texto-overlay');
-    const finalFramesCount = 43;
-    const baseUrlCaixa = "https://joaopnobrega.github.io/PetFeeder-Front/Embarcados2/data/frames/caixa%20";
+     // Sua configuração do Firebase (COLE A SUA AQUI - CUIDADO COM A CHAVE EM REPOSITÓRIOS PÚBLICOS)
+     const firebaseConfig = {
+       apiKey: "AIzaSyClMqeoGTnDv71Qnp-kPs9Yxifqc5_R7og", // Use sua chave real
+       authDomain: "petfeed-se.firebaseapp.com",
+       databaseURL: "https://petfeed-se-default-rtdb.firebaseio.com",
+       projectId: "petfeed-se",
+       storageBucket: "petfeed-se.appspot.com",
+       messagingSenderId: "651255070724",
+       appId: "1:651255070724:web:248b534e42c5887b2b3551",
+       measurementId: "G-DVH6XGRDBX"
+     };
 
-    // --- Classe FrameScrollSystem (sem mudanças) ---
+     // Inicializa o Firebase
+     const app = initializeApp(firebaseConfig);
+     // Obtém a referência do Realtime Database
+     const database = getDatabase(app);
+     // const analytics = getAnalytics(app); // Descomente se usar Analytics
+
+     // --- VARIÁVEIS GLOBAIS ---
+     let ultimoEvento = null;
+     let frameScrollSystems = [];
+     let requisitosObservers = [];
+     let pinnableObserver = null;
+     let activePinnableSection = null;
+     let requisitosScrollListenerActive = false;
+     let activeRequisitosScrollSystem = null;
+     let finalSectionActive = false;
+
+     const finalSectionElement = document.getElementById('secao-final');
+     const finalImageElement = document.getElementById('frame-final');
+     const finalTextOverlay = document.getElementById('final-texto-overlay');
+     const finalFramesCount = 43;
+     const baseUrlCaixa = "https://joaopnobrega.github.io/PetFeeder-Front/Embarcados2/data/frames/caixa%20";
+
+     // --- SEU CÓDIGO DE ANIMAÇÃO E SCROLL ---
     class FrameScrollSystem {
       constructor(element, totalFrames, baseUrl, sliderElement, isStaticTextRequirement = false, isMainSection = true, sectionElement) {
         this.element = element;
@@ -1127,140 +1144,339 @@ async function abrir() {
       const progressBar = document.getElementById('progressBar'); if (progressBar) progressBar.style.width = `${scrollPercent}%`;
     }
 
-    // --- Restante do JavaScript (sem mudanças) ---
-    function destacarElemento(el, duracao) { el.classList.add("destaque-verde"); setTimeout(() => el.classList.remove("destaque-verde"), duracao || 1000); }
-    document.getElementById("tempoRange").addEventListener("input", function () { document.getElementById("tempoLabel").textContent = `${this.value} ms`; });
-    function excluirRelatorio(btn) { const item = btn.closest(".relatorioItem"); if (item) item.remove(); }
-    function gerarRelatorioComDados(dados) {
-      const evento = dados.evento?.toLowerCase() || ""; let aba = "";
-      if (evento.includes("firebase")) aba = "firebase"; else if (evento.includes("botão") || evento.includes("botao")) aba = "botao"; else if (evento.includes("sensor")) aba = "sensor"; else return;
-      const container = document.getElementById(aba); if (!container) return;
-      const novoItem = document.createElement("div"); novoItem.classList.add("relatorioItem");
-      novoItem.innerHTML = `<button class="botaoExcluir" onclick="excluirRelatorio(this)">&#x2715;</button><ul><li><strong>Data:</strong> ${new Date().toLocaleString()}</li><li><strong>Distância:</strong> ${dados.distancia_cm} cm</li><li><strong>Potenciômetro:</strong> ${dados.potenciometro}</li><li><strong>Tempo de Abertura:</strong> ${dados.tempo_aberto_ms} ms</li><li><strong>Modo:</strong> ${dados.modo}</li><li><strong>Evento:</strong> ${dados.evento}</li></ul>`;
-      container.prepend(novoItem);
-    }
-    async function abrirPorta() {
-      const tempo = parseInt(document.getElementById("tempoRange").value);
-      await fetch(firebaseUrl + "comando/abrir.json", { method: "PUT", body: "true" });
-      mostrarNotificacaoGIF(tempo); if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
-      if ('Notification' in window && Notification.permission === 'granted') new Notification('PetFeeder Ativado!', { body: `Alimentador aberto por ${tempo}ms`});
-      alert("PetFeeder será aberto");
-    }
-    async function definirTempo() {
-      const tempo = parseInt(document.getElementById("tempoRange").value);
-      await fetch(firebaseUrl + "comando/tempo_remoto_ms.json", { method: "PUT", body: tempo.toString() });
-      const tempoLabel = document.getElementById("tempoLabel"); const originalText = tempoLabel.textContent;
-      tempoLabel.textContent = "Definido!"; tempoLabel.style.color = "var(--accent-green)";
-      setTimeout(() => { tempoLabel.textContent = originalText; tempoLabel.style.color = ""; }, 2000);
-      alert(`Tempo definido: ${tempo} ms`);
-    }
-    function atualizarDashboard(dados) {
-        if (!dados) return; const els = { distancia: document.getElementById('distancia'), pot: document.getElementById('pot'), tempo: document.getElementById('tempo'), modo: document.getElementById('modo'), evento: document.getElementById('evento') };
-        if (els.distancia && dados.distancia_cm !== undefined && els.distancia.textContent !== dados.distancia_cm?.toString()) { els.distancia.textContent = dados.distancia_cm; destacarElemento(els.distancia.parentElement, 2000); }
-        if (els.pot && dados.potenciometro !== undefined && els.pot.textContent !== dados.potenciometro?.toString()) { els.pot.textContent = dados.potenciometro; destacarElemento(els.pot.parentElement, 2000); }
-        if (els.tempo && dados.tempo_aberto_ms !== undefined && els.tempo.textContent !== dados.tempo_aberto_ms?.toString()) { els.tempo.textContent = dados.tempo_aberto_ms; destacarElemento(els.tempo.parentElement, 2000); }
-        if (els.modo && dados.modo !== undefined && els.modo.textContent !== dados.modo) { els.modo.textContent = dados.modo; destacarElemento(els.modo.parentElement, dados.tempo_aberto_ms || 1000); }
-        if (els.evento && dados.evento !== undefined && els.evento.textContent !== dados.evento) { els.evento.textContent = dados.evento; destacarElemento(els.evento.parentElement, dados.tempo_aberto_ms || 1000); }
-    }
-    function mostrarNotificacaoGIF(duracao = 5000) {
-        const animacao = document.getElementById("animacaoRacao"); animacao.style.display = "block"; animacao.classList.add('mostrar');
-        setTimeout(() => { animacao.classList.remove('mostrar'); setTimeout(() => { animacao.style.display = "none"; }, 600); }, duracao);
-    }
-    async function fetchDados() {
-      try {
-        const res = await fetch(firebaseUrl + "estado.json"); const dados = await res.json(); if (!dados) throw new Error("Dados nulos recebidos");
-        atualizarDashboard(dados); const evento = (dados.evento || "").toLowerCase();
-        if (evento && evento !== ultimoEvento) { ultimoEvento = evento; gerarRelatorioComDados(dados); if (evento.includes("abertura")) mostrarNotificacaoGIF(dados.tempo_aberto_ms || 5000); }
-        return dados;
-      } catch (error) {
-        console.error('Erro ao buscar dados:', error); const eventoEl = document.getElementById('evento');
-        if (eventoEl) { eventoEl.textContent = 'Erro de conexão'; eventoEl.style.color = 'var(--accent-red)'; }
-      }
-    }
+     // --- FUNÇÕES DE DASHBOARD ---
+     function destacarElemento(el, duracao = 1000) {
+         el.classList.add("destaque-verde");
+         setTimeout(() => el.classList.remove("destaque-verde"), duracao);
+     }
+
+     document.getElementById("tempoRange").addEventListener("input", function () {
+         document.getElementById("tempoLabel").textContent = `${this.value} ms`;
+     });
+
+     // --- FUNÇÕES DO FIREBASE (MODIFICADAS/NOVAS) ---
+
+     // Função para ABRIR PORTA (usa SDK)
+     async function abrirPorta() {
+       const tempo = parseInt(document.getElementById("tempoRange").value);
+       try {
+         // Envia 'true' para o nó 'comando/abrir'
+         await set(ref(database, 'comando/abrir'), true);
+         mostrarNotificacaoGIF(tempo);
+         if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+         if ('Notification' in window && Notification.permission === 'granted') {
+             new Notification('PetFeeder Ativado!', { body: `Alimentador aberto por ${tempo}ms` });
+         }
+         alert("Comando para abrir PetFeeder enviado!");
+       } catch (error) {
+         console.error("Erro ao abrir porta via Firebase:", error);
+         alert("Falha ao enviar comando.");
+       }
+     }
+
+     // Função para DEFINIR TEMPO (usa SDK)
+     async function definirTempo() {
+       const tempo = parseInt(document.getElementById("tempoRange").value);
+       try {
+         // Envia o valor do tempo para 'comando/tempo_remoto_ms'
+         await set(ref(database, 'comando/tempo_remoto_ms'), tempo);
+         const tempoLabel = document.getElementById("tempoLabel");
+         const originalText = tempoLabel.textContent;
+         tempoLabel.textContent = "Definido!";
+         tempoLabel.style.color = "var(--accent-green)";
+         setTimeout(() => { tempoLabel.textContent = originalText; tempoLabel.style.color = ""; }, 2000);
+         alert(`Tempo definido: ${tempo} ms`);
+       } catch (error) {
+         console.error("Erro ao definir tempo via Firebase:", error);
+         alert("Falha ao definir tempo.");
+       }
+     }
+
+     // Função para ATUALIZAR O DASHBOARD (sem mudanças na lógica, só nos dados)
+     function atualizarDashboard(dados) {
+         if (!dados) return;
+         const els = {
+             distancia: document.getElementById('distancia'),
+             pot: document.getElementById('pot'),
+             tempo: document.getElementById('tempo'),
+             modo: document.getElementById('modo'),
+             evento: document.getElementById('evento')
+         };
+         // Use os nomes dos campos como estão no seu Firebase (ex: distancia_cm)
+         if (els.distancia && dados.distancia_cm !== undefined && els.distancia.textContent !== dados.distancia_cm.toString()) { els.distancia.textContent = dados.distancia_cm; destacarElemento(els.distancia.parentElement, 2000); }
+         if (els.pot && dados.potenciometro !== undefined && els.pot.textContent !== dados.potenciometro.toString()) { els.pot.textContent = dados.potenciometro; destacarElemento(els.pot.parentElement, 2000); }
+         if (els.tempo && dados.tempo_aberto_ms !== undefined && els.tempo.textContent !== dados.tempo_aberto_ms.toString()) { els.tempo.textContent = dados.tempo_aberto_ms; destacarElemento(els.tempo.parentElement, 2000); }
+         if (els.modo && dados.modo !== undefined && els.modo.textContent !== dados.modo) { els.modo.textContent = dados.modo; destacarElemento(els.modo.parentElement); }
+         if (els.evento && dados.evento !== undefined && els.evento.textContent !== dados.evento) { els.evento.textContent = dados.evento; destacarElemento(els.evento.parentElement); }
+     }
+
+     // Função para MOSTRAR NOTIFICAÇÃO GIF (sem mudanças)
+     function mostrarNotificacaoGIF(duracao = 5000) {
+        const animacao = document.getElementById("animacaoRacao");
+        animacao.style.display = "block";
+        animacao.classList.add('mostrar');
+        setTimeout(() => {
+            animacao.classList.remove('mostrar');
+            setTimeout(() => { animacao.style.display = "none"; }, 600); // Espera a transição terminar
+        }, duracao);
+     }
+
+     // Função para ADICIONAR UM ITEM DE RELATÓRIO AO HTML (reutilizável)
+     function adicionarRelatorioAoHtml(id, dados, aba) {
+         const container = document.getElementById(aba);
+         if (!container) return;
+
+         // Evita adicionar duplicados se já existir
+         if (document.querySelector(`.relatorioItem[data-id="${id}"]`)) return;
+
+         const novoItem = document.createElement("div");
+         novoItem.classList.add("relatorioItem");
+         novoItem.setAttribute('data-id', id); // Armazena o ID do Firebase
+         novoItem.setAttribute('data-aba', aba); // Armazena a aba
+
+         novoItem.innerHTML = `
+             <button class="botaoExcluir" data-id="${id}" data-aba="${aba}">&#x2715;</button>
+             <ul>
+                 <li><strong>Data:</strong> ${new Date(dados.timestamp || Date.now()).toLocaleString('pt-BR')}</li>
+                 <li><strong>Distância:</strong> ${dados.distancia_cm || 'N/A'} cm</li>
+                 <li><strong>Potenciômetro:</strong> ${dados.potenciometro || 'N/A'}</li>
+                 <li><strong>Tempo de Abertura:</strong> ${dados.tempo_aberto_ms || 'N/A'} ms</li>
+                 <li><strong>Modo:</strong> ${dados.modo || 'N/A'}</li>
+                 <li><strong>Evento:</strong> ${dados.evento || 'N/A'}</li>
+             </ul>`;
+
+         container.prepend(novoItem); // Adiciona no início
+
+         // Adiciona o listener para o botão de excluir
+         novoItem.querySelector('.botaoExcluir').addEventListener('click', function() {
+             excluirRelatorio(this.dataset.id, this.dataset.aba);
+         });
+     }
+
+     // Função para SALVAR um novo relatório no Firebase
+     async function salvarRelatorioFirebase(dados, aba) {
+         try {
+             const relatoriosRef = ref(database, `relatorios/${aba}`);
+             const novoRelatorioRef = push(relatoriosRef); // Gera ID único
+             await set(novoRelatorioRef, {
+                 ...dados, // Salva todos os dados recebidos
+                 timestamp: new Date().toISOString() // Adiciona data/hora
+             });
+             console.log("Relatório salvo no Firebase:", novoRelatorioRef.key);
+         } catch (error) {
+             console.error("Erro ao salvar relatório no Firebase:", error);
+         }
+     }
+
+     // Função para EXCLUIR um relatório (HTML e Firebase)
+     async function excluirRelatorio(id, aba) {
+         const item = document.querySelector(`.relatorioItem[data-id="${id}"]`);
+         if (item) item.remove(); // Remove do HTML
+
+         try {
+             // Remove do Firebase
+             await remove(ref(database, `relatorios/${aba}/${id}`));
+             console.log("Relatório excluído do Firebase:", id);
+         } catch (error) {
+             console.error("Erro ao excluir relatório do Firebase:", error);
+         }
+     }
+
+     // Função para CARREGAR TODOS OS RELATÓRIOS do Firebase ao iniciar
+     function carregarTodosRelatorios() {
+         const relatoriosRef = ref(database, 'relatorios');
+         onValue(relatoriosRef, (snapshot) => {
+             const todasAbas = snapshot.val();
+             // Limpa todas as abas no HTML antes de recarregar
+             document.querySelectorAll('.abaRelatorio').forEach(aba => aba.innerHTML = '');
+
+             if (todasAbas) {
+                 // Itera sobre cada aba (firebase, botao, sensor)
+                 for (const abaNome in todasAbas) {
+                     const relatoriosDaAba = todasAbas[abaNome];
+                     // Itera sobre cada relatório dentro da aba
+                     for (const id in relatoriosDaAba) {
+                         adicionarRelatorioAoHtml(id, relatoriosDaAba[id], abaNome);
+                     }
+                 }
+             }
+         }, (error) => {
+             console.error("Erro ao carregar relatórios:", error);
+         });
+     }
+
+     // Função para OUVIR DADOS DE ESTADO (usa SDK)
+     function ouvirDadosEstado() {
+         const estadoRef = ref(database, 'estado');
+         onValue(estadoRef, (snapshot) => {
+             const dados = snapshot.val();
+             if (dados) {
+                 atualizarDashboard(dados);
+                 const eventoAtual = dados.evento || "";
+
+                 // Verifica se é um evento novo e relevante para salvar
+                 if (eventoAtual && eventoAtual !== ultimoEvento) {
+                     ultimoEvento = eventoAtual;
+
+                     let abaDestino = "";
+                     const eventoLower = eventoAtual.toLowerCase();
+
+                     if (eventoLower.includes("firebase") || eventoLower.includes("remoto")) {
+                         abaDestino = "firebase";
+                     } else if (eventoLower.includes("botão") || eventoLower.includes("botao")) {
+                         abaDestino = "botao";
+                     } else if (eventoLower.includes("sensor")) {
+                         abaDestino = "sensor";
+                     }
+
+                     // Se for um evento que queremos registrar E for uma abertura, salva
+                     if (abaDestino && eventoLower.includes("abertura")) {
+                          salvarRelatorioFirebase(dados, abaDestino);
+                          // Não precisa chamar adicionarRelatorioAoHtml aqui,
+                          // pois o listener de carregarTodosRelatorios já fará isso.
+                     }
+
+                     // Mostra o GIF se for uma abertura
+                     if (eventoLower.includes("abertura")) {
+                        mostrarNotificacaoGIF(dados.tempo_aberto_ms || 5000);
+                     }
+                 }
+             } else {
+                 console.log("Nenhum dado de estado encontrado.");
+                 const eventoEl = document.getElementById('evento');
+                 if (eventoEl) { eventoEl.textContent = 'Sem dados'; eventoEl.style.color = 'var(--text-muted)'; }
+             }
+         }, (error) => {
+             console.error('Erro ao buscar dados com onValue:', error);
+             const eventoEl = document.getElementById('evento');
+             if (eventoEl) { eventoEl.textContent = 'Erro de conexão'; eventoEl.style.color = 'var(--accent-red)'; }
+         });
+     }
+
+     // --- FUNÇÕES DE INTERFACE (Adaptação para usar IDs e listeners) ---
     function mostrarAba(abaId) {
-      document.querySelectorAll('.abaRelatorio').forEach(div => div.style.display = 'none'); document.querySelectorAll('.abaBtn').forEach(btn => btn.classList.remove('ativo'));
+      document.querySelectorAll('.abaRelatorio').forEach(div => div.style.display = 'none');
+      document.querySelectorAll('.abaBtn').forEach(btn => btn.classList.remove('ativo'));
       const abaSelecionada = document.getElementById(abaId);
       if(abaSelecionada) abaSelecionada.style.display = 'block';
       const btnSelecionado = document.querySelector(`.abaBtn[data-aba="${abaId}"]`);
       if(btnSelecionado) btnSelecionado.classList.add('ativo');
     }
+
     function alternarSobre() {
-        const sobre = document.getElementById('sobreDashboard'); const relatorio = document.getElementById('relatorioContainer');
-        sobre.classList.toggle('mostrar'); relatorio.classList.remove('mostrar');
+        const sobre = document.getElementById('sobreDashboard');
+        const relatorio = document.getElementById('relatorioContainer');
+        sobre.classList.toggle('mostrar');
+        relatorio.classList.remove('mostrar'); // Garante que relatório esteja escondido
+
         if (sobre.classList.contains('mostrar')) {
             sobre.scrollIntoView({ behavior: 'smooth', block: 'start' });
             const secaoAtivaInicial = document.querySelector('#sobreDashboard .navegacao-secoes .btn-secao.ativo');
             mostrarSecao(secaoAtivaInicial ? secaoAtivaInicial.dataset.secao : 'prototipo');
-        } else { deactivatePinnableSections(); deactivateRequisitosObservers(); requisitosScrollListenerActive = false; }
+        } else {
+            deactivatePinnableSections();
+            deactivateRequisitosObservers();
+            requisitosScrollListenerActive = false;
+        }
     }
+
     function alternarRelatorio() {
-        const relatorio = document.getElementById('relatorioContainer'); const sobre = document.getElementById('sobreDashboard');
+        const relatorio = document.getElementById('relatorioContainer');
+        const sobre = document.getElementById('sobreDashboard');
         relatorio.classList.toggle('mostrar');
+
         if (relatorio.classList.contains('mostrar')) {
-            sobre.classList.remove('mostrar'); relatorio.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            deactivatePinnableSections(); deactivateRequisitosObservers(); requisitosScrollListenerActive = false;
+            sobre.classList.remove('mostrar'); // Esconde "Sobre"
+            relatorio.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            deactivatePinnableSections(); // Desativa animações de "Sobre"
+            deactivateRequisitosObservers();
+            requisitosScrollListenerActive = false;
         } else if (sobre.classList.contains('mostrar')) {
+            // Se "Sobre" já estava ativo, reativa suas animações
             const secaoAtivaInicial = document.querySelector('#sobreDashboard .navegacao-secoes .btn-secao.ativo');
             mostrarSecao(secaoAtivaInicial ? secaoAtivaInicial.dataset.secao : 'prototipo');
         }
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
-      if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission();
 
-      initFrameScrollSystems();
-      createPinnableObserver();
+     // --- EVENT LISTENERS ---
+     document.addEventListener('DOMContentLoaded', function() {
+         // Notificações
+         if ('Notification' in window && Notification.permission === 'default') {
+             Notification.requestPermission();
+         }
 
-      for (let i = 1; i <= finalFramesCount; i++) new Image().src = `${baseUrlCaixa}(${i}).gif`;
+         // Animações e Scroll (seu código)
+         initFrameScrollSystems();
+         createPinnableObserver();
+         for (let i = 1; i <= finalFramesCount; i++) new Image().src = `${baseUrlCaixa}(${i}).gif`;
+         let tickingScroll = false;
+         window.addEventListener('scroll', () => {
+             if (!tickingScroll) {
+                 requestAnimationFrame(() => {
+                     handleGlobalScroll();
+                     tickingScroll = false;
+                 });
+                 tickingScroll = true;
+             }
+         });
+         window.addEventListener('resize', handleScroll);
+         document.addEventListener('keydown', (e) => {
+             if (e.key.toLowerCase() === 'd') {
+                 const counter = document.getElementById('frameCounter');
+                 counter.style.display = counter.style.display === 'none' ? 'block' : 'none';
+             }
+         });
+         let konamiCode = []; const konami = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65];
+         document.addEventListener('keydown', (e) => {
+             konamiCode.push(e.keyCode); if (konamiCode.length > konami.length) konamiCode.shift();
+             if (konamiCode.join(',') === konami.join(',')) { document.body.style.animation = 'rainbow 2s infinite'; setTimeout(() => { document.body.style.animation = ''; }, 10000); }
+         });
+         const cards = document.querySelectorAll('.card');
+         cards.forEach((card, i) => {
+             card.style.opacity = '0'; card.style.transform = 'translateY(30px)';
+             setTimeout(() => { card.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)'; card.style.opacity = '1'; card.style.transform = 'translateY(0)'; }, i * 200);
+         });
 
-      let tickingScroll = false;
-      window.addEventListener('scroll', () => {
-        if (!tickingScroll) {
-          requestAnimationFrame(() => {
-            handleGlobalScroll();
-            tickingScroll = false;
-          });
-          tickingScroll = true;
-        }
-      });
+         // Adiciona listeners aos botões com IDs
+         document.getElementById('btnAbrirPorta').addEventListener('click', abrirPorta);
+         document.getElementById('btnDefinirTempo').addEventListener('click', definirTempo);
+         document.getElementById('btnVerRelatorio').addEventListener('click', alternarRelatorio);
+         document.getElementById('btnSobreDashboard').addEventListener('click', alternarSobre);
 
-      window.addEventListener('resize', handleScroll);
-      document.addEventListener('keydown', (e) => {
-        if (e.key.toLowerCase() === 'd') {
-          const counter = document.getElementById('frameCounter');
-          counter.style.display = counter.style.display === 'none' ? 'block' : 'none';
-        }
-      });
-      let konamiCode = []; const konami = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65];
-      document.addEventListener('keydown', (e) => {
-        konamiCode.push(e.keyCode); if (konamiCode.length > konami.length) konamiCode.shift();
-        if (konamiCode.join(',') === konami.join(',')) { document.body.style.animation = 'rainbow 2s infinite'; setTimeout(() => { document.body.style.animation = ''; }, 10000); }
-      });
-      const cards = document.querySelectorAll('.card');
-      cards.forEach((card, i) => {
-        card.style.opacity = '0'; card.style.transform = 'translateY(30px)';
-        setTimeout(() => { card.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)'; card.style.opacity = '1'; card.style.transform = 'translateY(0)'; }, i * 200);
-      });
-      fetchDados();
-      document.getElementById('relatorioContainer').classList.remove('mostrar'); // Começa escondido
-      document.getElementById('sobreDashboard').classList.add('mostrar'); // Começa mostrando "Sobre"
-      mostrarSecao('prototipo');
-      mostrarAba('firebase');
-      // Garante que a opacidade inicial seja 0 ao carregar
-      finalImageElement.style.opacity = 0;
-      finalTextOverlay.style.opacity = 0;
-    });
+         document.getElementById('btnAbaFirebase').addEventListener('click', () => mostrarAba('firebase'));
+         document.getElementById('btnAbaBotao').addEventListener('click', () => mostrarAba('botao'));
+         document.getElementById('btnAbaSensor').addEventListener('click', () => mostrarAba('sensor'));
 
-    setInterval(fetchDados, 2000);
-    if ('serviceWorker' in navigator) navigator.serviceWorker.register('data:text/javascript,').catch(() => {});
-    const style = document.createElement('style');
-    style.textContent = `
-      @keyframes rainbow { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
-      @keyframes glow { 0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 136, 0.3); } 50% { box-shadow: 0 0 40px rgba(0, 255, 136, 0.8); } }
-      .card:hover::after { content: ''; position: absolute; top: -2px; left: -2px; right: -2px; bottom: -2px; border-radius: 26px; z-index: -1; animation: glow 2s ease-in-out infinite; }
-    `;
-    document.head.appendChild(style);
+         document.getElementById('btnSecaoPrototipo').addEventListener('click', () => mostrarSecao('prototipo'));
+         document.getElementById('btnSecaoVersaoFinal').addEventListener('click', () => mostrarSecao('versaoFinal'));
+         document.getElementById('btnSecaoRequisitos').addEventListener('click', () => mostrarSecao('requisitos'));
+
+         // Carrega estado inicial e começa a ouvir o Firebase
+         document.getElementById('relatorioContainer').classList.remove('mostrar');
+         document.getElementById('sobreDashboard').classList.add('mostrar');
+         mostrarSecao('prototipo');
+         mostrarAba('firebase');
+         finalImageElement.style.opacity = 0;
+         finalTextOverlay.style.opacity = 0;
+
+         // INICIA OUVINTE DO FIREBASE PARA ESTADO
+         ouvirDadosEstado();
+         // CARREGA OS RELATÓRIOS SALVOS
+         carregarTodosRelatorios();
+
+     });
+
+     // --- CÓDIGOS FINAIS (Service Worker, Estilos) ---
+     if ('serviceWorker' in navigator) navigator.serviceWorker.register('data:text/javascript,').catch(() => {});
+     const style = document.createElement('style');
+     style.textContent = `
+       @keyframes rainbow { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
+       @keyframes glow { 0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 136, 0.3); } 50% { box-shadow: 0 0 40px rgba(0, 255, 136, 0.8); } }
+       .card:hover::after { content: ''; position: absolute; top: -2px; left: -2px; right: -2px; bottom: -2px; border-radius: 26px; z-index: -1; animation: glow 2s ease-in-out infinite; }
+     `;
+     document.head.appendChild(style);
+
   </script>
-
 </body>
 </html>
