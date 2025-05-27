@@ -1,0 +1,1547 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PetFeeder</title>
+    <style>
+        /* Estilos CSS - (Originais + Modificações v6 + Novas Modificações) */
+        :root {
+            --bg-primary: #000000;
+            --bg-secondary: #1c1c1e;
+            --bg-tertiary: #2c2c2e;
+            --bg-quaternary: #3a3a3c;
+            --bg-welcome: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --text-primary: #ffffff;
+            --text-secondary: #8e8e93;
+            --border-color: #38383a;
+            --accent-primary: #007aff;
+            --accent-secondary: #0056b3;
+            --status-green: #34c759;
+            --status-red: #ff3b30;
+            --status-orange: #ff9500;
+            --status-purple: #5856d6;
+            --slider-thumb: #ffffff;
+            --nav-bg: rgba(28, 28, 30, 0.9);
+            --nav-island-bg: rgba(44, 44, 46, 0.95);
+            --notification-bg: rgba(50, 50, 50, 0.85);
+            --button-disabled-bg: #58585a;
+            --button-disabled-text: #8e8e93;
+            --welcome-btn-bg: rgba(255, 255, 255, 0.25);
+            --welcome-btn-border: rgba(255, 255, 255, 0.3);
+            --welcome-btn-hover: rgba(255, 255, 255, 0.35);
+            --scrollbar-thumb: rgba(100, 100, 100, 0.5);
+            --scrollbar-track: rgba(40, 40, 40, 0.1);
+            --screen-enter-transform: translateY(20px);
+            --screen-exit-transform: translateY(-20px);
+            --suggestion-bg: var(--bg-tertiary);
+            --datetime-scheme: dark;
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #f2f2f7;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #e5e5ea;
+            --bg-quaternary: #d1d1d6;
+            --text-primary: #000000;
+            --text-secondary: #6e6e73;
+            --border-color: #d1d1d6;
+            --nav-bg: rgba(248, 248, 248, 0.85);
+            --nav-island-bg: rgba(229, 229, 234, 0.95);
+            --notification-bg: rgba(230, 230, 230, 0.85);
+            --button-disabled-bg: #d1d1d6;
+            --button-disabled-text: #8e8e93;
+            --scrollbar-thumb: rgba(180, 180, 180, 0.7);
+            --scrollbar-track: rgba(220, 220, 220, 0.3);
+            --suggestion-bg: var(--bg-secondary);
+            --datetime-scheme: light;
+            --accent-primary: #007aff;
+            --accent-secondary: #0056b3;
+        }
+
+        [data-theme="blue"] {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --bg-quaternary: #30363d;
+            --text-primary: #c9d1d9;
+            --text-secondary: #8b949e;
+            --border-color: #30363d;
+            --accent-primary: #58a6ff;
+            --accent-secondary: #388bfd;
+            --nav-bg: rgba(22, 27, 34, 0.9);
+            --nav-island-bg: rgba(33, 38, 45, 0.95);
+            --notification-bg: rgba(33, 38, 45, 0.85);
+            --scrollbar-thumb: rgba(88, 166, 255, 0.5);
+            --scrollbar-track: rgba(33, 38, 45, 0.1);
+            --suggestion-bg: var(--bg-tertiary);
+        }
+
+        [data-theme="gradient"] {
+            --bg-primary: var(--bg-welcome);
+            --bg-secondary: #1c1c1e;
+            --bg-tertiary: #2c2c2e;
+            --bg-quaternary: #3a3a3c;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --border-color: #38383a;
+            --accent-primary: #ffffff; /* This is white for gradient */
+            --accent-secondary: #f0f0f0;
+            --slider-thumb: #ffffff;
+            --nav-bg: rgba(10, 10, 10, 0.7);
+            --nav-island-bg: rgba(28, 28, 30, 0.95);
+            --notification-bg: rgba(10, 10, 10, 0.8);
+            --button-disabled-bg: #58585a;
+            --button-disabled-text: #8e8e93;
+            --scrollbar-thumb: rgba(255, 255, 255, 0.4);
+            --scrollbar-track: rgba(0, 0, 0, 0.1);
+            --suggestion-bg: rgba(28, 28, 30, 0.8);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-primary); min-height: 100vh; overflow: hidden; color: var(--text-primary); transition: background 0.3s, color 0.3s; }
+        .screen { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; display: flex; flex-direction: column; align-items: center; opacity: 0; transform: var(--screen-enter-transform); transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); background: var(--bg-primary); padding: 20px; padding-bottom: 90px; overflow-y: auto; justify-content: flex-start; }
+        .screen.active { opacity: 1; transform: translateY(0); z-index: 10; }
+        .screen:not(.active) { z-index: 1; }
+        .screen-content { width: 100%; max-width: 400px; display: flex; flex-direction: column; align-items: stretch; flex-grow: 1; justify-content: flex-start; padding-top: 20px; }
+
+        .welcome-screen { background: var(--bg-welcome); text-align: center; justify-content: center; padding-bottom: 20px; }
+        .welcome-screen .screen-content { align-items: center; flex-grow: 0; }
+        .app-icon { width: 120px; height: 120px; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(20px); border-radius: 28px; display: flex; align-items: center; justify-content: center; font-size: 60px; margin-bottom: 30px; animation: bounce 2s infinite; color: white; }
+        @keyframes bounce { 0%, 20%, 50%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-10px); } 60% { transform: translateY(-5px); } }
+        .welcome-title, .welcome-subtitle { color: white; opacity: 0; animation: fadeInUp 1s forwards; }
+        .welcome-title { font-size: 32px; font-weight: 700; margin-bottom: 16px; animation-delay: 0.5s; }
+        .welcome-subtitle { font-size: 18px; opacity: 0.9; margin-bottom: 50px; animation-delay: 0.7s; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .continue-btn { background: var(--welcome-btn-bg); backdrop-filter: blur(20px); border: 1px solid var(--welcome-btn-border); color: white; padding: 16px 40px; border-radius: 25px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; opacity: 0; animation: fadeInUp 1s 0.9s forwards; }
+        .continue-btn:hover { background: var(--welcome-btn-hover); transform: translateY(-2px); }
+        .setup-screen .screen-content { justify-content: center; }
+        .setup-header { text-align: center; margin-bottom: 40px; margin-top: 10px; }
+        .setup-title { font-size: 28px; font-weight: 700; margin-bottom: 8px; color: var(--text-primary); }
+        .setup-subtitle { font-size: 16px; color: var(--text-secondary); }
+        .input-group { margin-bottom: 20px; }
+        .input-label { font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; padding-left: 5px; display: block; }
+        .pet-input, .settings-select { width: 100%; padding: 16px; border: 1px solid var(--border-color); border-radius: 12px; background: var(--bg-secondary); color: var(--text-primary); font-size: 17px; font-weight: 500; transition: all 0.3s ease; -webkit-appearance: none; -moz-appearance: none; appearance: none; }
+        .settings-select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%238e8e93' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 16px center; padding-right: 40px;}
+        .pet-input:focus, .settings-select:focus { outline: none; background: var(--bg-tertiary); box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.4); border-color: var(--accent-primary); }
+        .pet-selector { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 30px; }
+        .pet-option { background: var(--bg-secondary); border: 2px solid var(--bg-secondary); border-radius: 16px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.3s ease; }
+        .pet-option:hover { background: var(--bg-tertiary); }
+        .pet-option.selected { border-color: var(--accent-primary) !important; background: var(--bg-secondary); box-shadow: 0 0 8px var(--accent-primary); }
+        .pet-option-emoji { font-size: 36px; margin-bottom: 10px; }
+        .pet-option-name { font-size: 14px; font-weight: 500; color: var(--text-primary); }
+        .setup-btn { width: 100%; background: var(--accent-primary); color: white; border: none; padding: 18px; border-radius: 14px; font-size: 17px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; margin-top: 20px; }
+        [data-theme="gradient"] .setup-btn { color: #333; }
+        .setup-btn:hover:not(:disabled) { background: var(--accent-secondary); transform: translateY(-1px); }
+        .setup-btn:disabled { background: var(--button-disabled-bg); color: var(--button-disabled-text); cursor: not-allowed; }
+        .demo-screen { background: var(--bg-secondary); text-align: center; padding-bottom: 40px; }
+        [data-theme="gradient"] .demo-screen { background: transparent; }
+        .demo-screen .screen-content { justify-content: center; max-width: 320px; }
+        .demo-progress { width: 100%; height: 5px; background: var(--bg-quaternary); border-radius: 2.5px; margin-bottom: 60px; overflow: hidden; }
+        .demo-progress-bar { height: 100%; background: var(--accent-primary); border-radius: 2.5px; width: 0; transition: width 0.5s ease-out; }
+        .demo-content { min-height: 250px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .demo-icon { font-size: 80px; margin-bottom: 30px; animation: pulse 2.5s infinite ease-in-out; color: var(--text-primary);}
+        @keyframes pulse { 0% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1); opacity: 0.8; } }
+        .demo-title { font-size: 24px; font-weight: 600; margin-bottom: 16px; color: var(--text-primary); }
+        .demo-description { font-size: 16px; color: var(--text-secondary); line-height: 1.5; }
+        .skip-btn { background: none; border: none; color: var(--accent-primary); padding: 12px 24px; border-radius: 20px; font-size: 15px; cursor: pointer; margin-top: 40px; transition: all 0.3s ease; }
+        .skip-btn:hover { background: rgba(0, 122, 255, 0.1); }
+        [data-theme="gradient"] .skip-btn:hover { background: rgba(255, 255, 255, 0.1); }
+        .dashboard, .monitor-screen, .reports-screen, .routines-screen, .settings-screen { justify-content: flex-start; }
+        [data-theme="gradient"] .dashboard, [data-theme="gradient"] .monitor-screen,
+        [data-theme="gradient"] .reports-screen, [data-theme="gradient"] .routines-screen,
+        [data-theme="gradient"] .settings-screen { background: transparent; }
+        .dashboard .screen-content-fullwidth { width: 100%; max-width: 900px; display: flex; justify-content: center; align-items: flex-start; gap: 15px; padding: 0 10px; margin: 0 auto; }
+        .dashboard #dashboardCenterColumn { flex-grow: 1; max-width: 400px; display: flex; flex-direction: column; align-items: stretch;}
+        .quick-access-card { flex-basis: 220px; flex-shrink: 0; background: var(--bg-secondary); border-radius: 16px; padding: 15px; margin-top: 20px; align-self: stretch; display: flex; flex-direction: column; }
+        .quick-access-card h4 { font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--border-color); text-align: center; }
+        .quick-access-card p { font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; line-height: 1.4; text-align: left; }
+        .quick-access-card .value { font-weight: 600; color: var(--text-primary); }
+        .quick-access-card .details-btn { width: 100%; background: var(--bg-tertiary); color: var(--accent-primary); border: 1px solid var(--border-color); padding: 10px; border-radius: 10px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; margin-top: auto; text-align: center; }
+        .quick-access-card .details-btn:hover { background: var(--bg-quaternary); }
+        .quick-access-card .icon-value-row { display: flex; align-items: center; margin-bottom: 4px; }
+        .quick-access-card .icon-value-row .icon { font-size: 14px; margin-right: 8px; width: 16px; text-align: center;}
+        @media (max-width: 768px) {
+            .dashboard .screen-content-fullwidth { flex-direction: column; align-items: center; max-width: 400px; }
+            .quick-access-card { width: 100%; flex-basis: auto; margin-top: 20px; }
+            #quickAccessLeftContainer { order: 2; }
+            #dashboardCenterColumn { order: 1; width:100%;}
+            #quickAccessRightContainer { order: 3; }
+        }
+        .dashboard .screen-content, .monitor-screen .screen-content, .reports-screen .screen-content, .routines-screen .screen-content { justify-content: flex-start; }
+        .settings-screen .screen-content { max-width: 400px; margin: 0 auto; } /* Mobile default */
+        .dashboard-header, .screen-header { text-align: center; margin-bottom: 30px; padding-top: 20px; }
+        .screen-header h2 { font-size: 24px; font-weight: 700; color: var(--text-primary); }
+        .pet-avatar { width: 80px; height: 80px; background-color: var(--bg-quaternary); background-size: cover; background-position: center; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; color: var(--text-primary); margin: 0 auto 16px; border: 2px solid var(--accent-primary); }
+        .pet-name { font-size: 24px; font-weight: 700; margin-bottom: 8px; color: var(--text-primary); }
+        .pet-subtitle { font-size: 14px; color: var(--text-secondary); }
+        .status-card, .monitor-card, .control-card { background: var(--bg-secondary); border-radius: 16px; padding: 20px; margin-bottom: 20px; }
+        .status-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--border-color); }
+        .status-row:last-child { border-bottom: none; }
+        .status-label { font-size: 16px; color: var(--text-primary); }
+        .status-value { font-size: 16px; font-weight: 500; color: var(--text-secondary); }
+        .status-online { color: var(--status-green); }
+        .status-offline { color: var(--status-red); }
+        .feed-btn { width: 100%; background: var(--accent-primary); color: white; border: none; border-radius: 14px; padding: 18px; font-size: 17px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; margin-top: 10px; }
+        [data-theme="gradient"] .feed-btn { color: #333; }
+        .feed-btn:hover:not(:disabled) { background: var(--accent-secondary); transform: translateY(-1px); }
+        .feed-btn:disabled { background: var(--button-disabled-bg); color: var(--button-disabled-text); cursor: not-allowed; }
+        .notification { position: fixed; top: 50px; left: 50%; transform: translateX(-50%) translateY(-150px); background: var(--notification-bg); color: var(--text-primary); padding: 14px 20px; border-radius: 25px; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 6000; box-shadow: 0 4px 15px rgba(0,0,0,0.2); opacity: 0; visibility: hidden; }
+        .notification.show { transform: translateX(-50%) translateY(0); opacity: 1; visibility: visible;}
+        .notification-content { display: flex; align-items: center; gap: 12px; }
+        .notification-icon { font-size: 18px; }
+        .notification-text { font-size: 14px; font-weight: 500; }
+        .nav-bar { position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%); width: auto; background: var(--nav-island-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 28px; display: flex; justify-content: center; align-items: center; padding: 8px 10px; z-index: 100; box-shadow: 0 4px 14px rgba(0,0,0,0.25); transition: all 0.3s ease; }
+        .nav-item { color: var(--text-secondary); text-align: center; cursor: pointer; transition: all 0.3s ease; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6px 12px; min-width: 50px; position: relative; }
+        .nav-item .nav-icon { font-size: 24px; margin-bottom: 0; display: block; line-height: 1; transition: transform 0.2s ease; }
+        .nav-item .nav-text { font-size: 10px; font-weight: 500; color: var(--text-secondary); opacity: 0; transform: translateY(5px); transition: opacity 0.2s ease, transform 0.2s ease; position: absolute; bottom: -18px; left: 50%; transform: translateX(-50%) translateY(5px); background-color: var(--nav-island-bg); padding: 2px 6px; border-radius: 5px; white-space: nowrap; pointer-events: none; }
+        .nav-item:hover .nav-icon { transform: scale(1.1); }
+        .nav-item:hover .nav-text { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .nav-item.active .nav-icon { color: var(--accent-primary); transform: scale(1.15); }
+        .nav-item.active .nav-text { opacity: 1; transform: translateX(-50%) translateY(0); color: var(--accent-primary); }
+        .monitor-card h3, .control-card h3 { font-size: 18px; font-weight: 600; margin-bottom: 15px; color: var(--text-primary); padding-bottom: 10px; border-bottom: 1px solid var(--border-color); }
+        .monitor-card h3[style*="border-bottom: none"] { border-bottom: none !important; }
+        .proximity-graph { height: 80px; background: var(--bg-tertiary); border-radius: 8px; margin-bottom: 20px; position: relative; overflow: hidden; border: 1px solid var(--border-color); }
+        .proximity-bar { position: absolute; bottom: 0; left: 0; width: 0; height: 100%; background: var(--accent-primary); transition: width 0.3s ease; }
+        .proximity-threshold { position: absolute; top: 0; bottom: 0; width: 3px; background: var(--status-orange); transition: right 0.3s ease; border-radius: 2px; box-shadow: 0 0 5px rgba(255, 149, 0, 0.5); }
+        .proximity-text { position: absolute; top: 8px; right: 8px; font-size: 11px; color: #fff; background: rgba(0,0,0,0.4); padding: 2px 5px; border-radius: 3px; }
+        .timer-display { text-align: center; font-size: 20px; font-weight: 600; margin-bottom: 20px; padding: 15px; border-radius: 12px; transition: color 0.3s, background-color 0.3s; background: var(--bg-tertiary); }
+        .timer-display.closed { color: var(--status-red); }
+        .timer-display.open { color: var(--status-green); }
+        .slider-group { margin-bottom: 25px; }
+        .slider-group label { display: block; margin-bottom: 15px; color: var(--text-secondary); font-size: 16px; }
+        .slider-group input[type="range"] { width: 100%; cursor: pointer; -webkit-appearance: none; height: 8px; background: var(--bg-quaternary); border-radius: 4px; outline: none; transition: opacity .15s ease-in-out; }
+        .slider-group input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 28px; height: 28px; background: var(--slider-thumb); border-radius: 50%; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.2); border: 0.5px solid rgba(0,0,0,0.1); }
+        .slider-group input[type="range"]::-moz-range-thumb { width: 28px; height: 28px; background: var(--slider-thumb); border-radius: 50%; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+        .slider-group span { float: right; font-weight: 600; color: var(--text-primary); font-size: 16px; }
+        .dev-message { text-align: center; color: var(--text-secondary); padding: 60px 20px; font-size: 16px; line-height: 1.5; background: var(--bg-secondary); border-radius: 16px; margin-top: 30px; }
+        .dev-message span { font-size: 50px; display: block; margin-bottom: 20px; }
+        .feed-btn.save { background-color: var(--status-green); } .feed-btn.save:hover { background-color: #2ca048; }
+        .feed-btn.manual { background-color: var(--status-purple); } .feed-btn.manual:hover { background-color: #4644a8; }
+        .feed-btn.reset-btn { background-color: var(--status-red); } .feed-btn.reset-btn:hover { background-color: #c70015; }
+        .settings-screen .pet-selector { grid-template-columns: repeat(3, 1fr); }
+        .settings-screen .pet-option { padding: 15px; }
+        .settings-screen .pet-option-emoji { font-size: 28px; }
+        .settings-screen .pet-option-name { font-size: 10px; }
+        .settings-screen .control-card h3 { border-bottom: none; padding-bottom: 0; margin-bottom: 20px; text-align: center; font-size: 16px; color: var(--text-secondary); text-transform: uppercase; }
+        .settings-screen .input-group { margin-bottom: 20px; }
+        .settings-p { color: var(--text-secondary); font-size: 13px; text-align: center; margin-top: 10px; line-height: 1.4; }
+        .theme-selector { display: flex; justify-content: space-around; padding: 10px 0; }
+        .theme-option { cursor: pointer; text-align: center; }
+        .theme-option input { display: none; }
+        .theme-option .theme-preview { width: 50px; height: 50px; border-radius: 50%; margin-bottom: 8px; border: 3px solid transparent; transition: border-color 0.3s; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .theme-option input:checked + .theme-preview { border-color: var(--accent-primary); }
+        .theme-preview.dark { background: #000000; border-color: #38383a; color: white; }
+        .theme-preview.light { background: #f2f2f7; border-color: #d1d1d6; color: black; }
+        .theme-preview.blue { background: #0d1117; border-color: #30363d; color: #58a6ff; }
+        .theme-preview.gradient { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-color: rgba(255,255,255,0.3); color: white;}
+        .reports-screen .control-card h3 { text-align: left; text-transform: none; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 15px;}
+        .report-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; font-size: 15px; border-bottom: 1px solid var(--border-color); }
+        .report-item:last-child { border-bottom: none; }
+        .report-item .label { color: var(--text-primary); }
+        .report-item .value { color: var(--text-secondary); font-weight: 500; }
+        .report-list { list-style: none; padding: 0; margin-top: 15px; }
+        .report-list-item { background: var(--bg-tertiary); padding: 10px 15px; border-radius: 8px; margin-bottom: 8px; font-size: 13px; color: var(--text-secondary); display: flex; justify-content: space-between; }
+        .report-list-item .time { color: var(--text-primary); font-weight: 500; }
+        .no-reports { text-align: center; color: var(--text-secondary); padding: 40px 20px; font-size: 16px; }
+        .clear-reports-btn { background-color: var(--status-orange) !important; margin-top: 20px !important; }
+        .clear-reports-btn:hover { background-color: #e68a00 !important; }
+        #routineSuggestionCard { background: var(--suggestion-bg); padding: 15px; border-radius: 12px; border: 1px solid var(--border-color); }
+        #routineSuggestionCard h4 { font-size: 16px; color: var(--text-primary); margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--border-color); }
+        #routineSuggestionResult { font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; min-height: 50px; display: flex; align-items: center; justify-content: center; flex-direction: column; text-align: left; }
+        .loading-spinner { width: 24px; height: 24px; border: 3px solid var(--accent-primary-alpha, rgba(0,122,255,0.2)); border-top-color: var(--accent-primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 10px auto; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        #routineActiveCard .status-value.small-date { font-size: 13px; font-weight: 400; }
+        #routineActiveCard .status-value.paused { color: var(--status-orange); }
+        .routine-period-display { background: var(--bg-tertiary); padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: center;}
+        .definer-periodo-btn {
+            background-color: #fff;
+            color: var(--accent-primary);
+            border: 1px solid var(--border-color);
+            padding: 10px 20px;
+            font-size: 15px;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 0;
+            display: inline-block;
+            font-weight: 600;
+        }
+        .definer-periodo-btn:hover {
+            opacity: 0.85;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        [data-theme="gradient"] .definer-periodo-btn {
+            color: #764ba2 !important;
+            border-color: rgba(255,255,255,0.4);
+        }
+
+
+        .ios-picker-trigger { cursor: pointer !important; }
+        .ios-picker-trigger::placeholder { color: var(--text-secondary); opacity: 0.8; }
+        [data-theme="light"] .ios-picker-trigger::placeholder { opacity: 0.6; }
+
+        .ios-picker-box {
+            background: var(--bg-tertiary);
+            padding: 0;
+            margin-top: 20px;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            transition: max-height 0.3s ease-out, opacity 0.3s ease-out, padding 0.3s ease-out;
+            max-height: 0;
+            opacity: 0;
+            padding-bottom: 0;
+        }
+         .ios-picker-box.show {
+            max-height: 400px;
+            opacity: 1;
+            padding-bottom: 10px;
+         }
+        .ios-picker-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--bg-quaternary);
+            flex-shrink: 0;
+        }
+        .ios-picker-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .ios-picker-btn {
+            background: none;
+            border: none;
+            color: var(--accent-primary);
+            font-size: 17px;
+            cursor: pointer;
+            padding: 5px;
+            font-weight: 400;
+        }
+        .ios-picker-btn.set { font-weight: 600; }
+        .ios-picker-btn.cancel { color: var(--accent-primary); }
+        .ios-picker-body {
+            position: relative;
+            padding: 10px 0;
+            height: 216px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+        }
+        .ios-picker-wheels {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            width: 100%;
+            position: relative;
+            padding: 0 5px;
+        }
+        .ios-picker-col {
+            flex: 1;
+            height: 100%;
+            overflow: hidden;
+            position: relative;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
+            display: flex;
+            justify-content: center;
+        }
+         .ios-picker-col.day { flex-grow: 1.2; }
+         .ios-picker-col.month { flex-grow: 1.5; }
+         .ios-picker-col.year { flex-grow: 1.3; }
+         .ios-picker-col.hour, .ios-picker-col.minute { flex-grow: 1.2; }
+         .ios-picker-col.duration { flex-grow: 1; }
+         .ios-picker-col.single { flex-grow: 1 !important; max-width: 150px; flex-basis: 100%; }
+        .ios-picker-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            transition: transform 0.25s ease-out;
+            position: relative;
+            top: 0;
+            will-change: transform;
+            width: 100%;
+        }
+        .ios-picker-list li {
+            height: 44px;
+            line-height: 44px;
+            text-align: center;
+            font-size: 20px;
+            color: var(--text-primary);
+            width: 100%;
+            transform-origin: center center;
+            transition: opacity 0.2s, transform 0.2s, font-weight 0.2s, color 0.2s;
+            opacity: 0.3;
+            transform: scale(0.8);
+            font-weight: 400;
+            box-sizing: border-box;
+        }
+        .ios-picker-highlight {
+            position: absolute;
+            top: 86px;
+            left: 5px;
+            right: 5px;
+            height: 44px;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            pointer-events: none;
+            z-index: 5;
+            background-color: rgba(0, 122, 255, 0.05);
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        .column {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+        }
+
+        .column .control-card,
+        .column .monitor-card,
+        .column #routineSuggestionCard {
+            margin-bottom: 0 !important;
+            width: 100%;
+        }
+
+         .column #routineSuggestionCard {
+            margin-top: 0 !important;
+        }
+
+        .save-all-btn-container {
+            width: 100%;
+            margin-top: 20px;
+        }
+        .save-all-btn-container .feed-btn {
+            margin-top: 0;
+        }
+
+        .about-btn-container {
+            width: 100%;
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .btn-sobre {
+            background-color: var(--bg-tertiary);
+            color: var(--accent-primary);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            font-size: 14px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+            font-weight: 500;
+        }
+
+        .btn-sobre:hover {
+            background-color: var(--bg-quaternary);
+            opacity: 0.9;
+        }
+
+        [data-theme="gradient"] .btn-sobre {
+            background-color: rgba(255,255,255,0.1);
+            color: var(--text-primary);
+            border-color: rgba(255,255,255,0.3);
+        }
+        [data-theme="gradient"] .btn-sobre:hover {
+            background-color: rgba(255,255,255,0.2);
+        }
+
+
+        @media (min-width: 769px) {
+            .monitor-screen .screen-content,
+            .routines-screen .screen-content,
+            .settings-screen .screen-content {
+                max-width: 900px;
+                margin: 0 auto;
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+                align-items: flex-start;
+                gap: 20px;
+            }
+
+            .monitor-screen .screen-content .screen-header,
+            .routines-screen .screen-content .screen-header,
+            .settings-screen .screen-content .screen-header {
+                flex-basis: 100%;
+                margin-bottom: 30px;
+            }
+
+            .monitor-screen .screen-content .column,
+            .routines-screen .screen-content .column,
+            .settings-screen .screen-content .column {
+                flex: 1;
+                min-width: 300px;
+                max-width: 420px;
+            }
+
+            .settings-screen .screen-content .save-all-btn-container {
+                flex-basis: 100%;
+                text-align: center;
+                margin-top: 20px; /* Original space before save button */
+            }
+             .settings-screen .screen-content .save-all-btn-container .feed-btn {
+                max-width: 400px;
+                display: inline-block;
+                width: 100%;
+                margin: 0 auto;
+             }
+            .settings-screen .screen-content .about-btn-container {
+                flex-basis: 100%;
+                margin-top: 10px; /* Reduced distance for desktop after save button */
+            }
+        }
+
+    </style>
+</head>
+<body data-theme="dark">
+
+    <div class="screen welcome-screen active" id="welcomeScreen">
+        <div class="screen-content">
+            <div class="app-icon">🍽️</div>
+            <h1 class="welcome-title">PetFeeder</h1>
+            <p class="welcome-subtitle">Alimentação inteligente para seu companheiro</p>
+            <button class="continue-btn" onclick="navigateTo('setupScreen')">Começar</button>
+        </div>
+    </div>
+
+    <div class="screen setup-screen" id="setupScreen">
+        <div class="screen-content">
+            <div class="setup-header">
+                <h2 class="setup-title">Olá! 👋</h2>
+                <p class="setup-subtitle">Vamos conhecer seu pet</p>
+            </div>
+            <div class="input-group">
+                <div class="input-label">Nome do Pet</div>
+                <input type="text" class="pet-input" id="petNameInput" placeholder="Ex: Buddy, Luna..." maxlength="20">
+            </div>
+            <div class="input-group">
+                <div class="input-label">Tipo do Pet</div>
+                <div class="pet-selector" id="setupPetSelector"></div>
+            </div>
+            <button class="setup-btn" id="setupContinueBtn" onclick="finishSetup()" disabled>Continuar</button>
+        </div>
+    </div>
+
+    <div class="screen demo-screen" id="demoScreen">
+        <div class="screen-content">
+            <div class="demo-progress"> <div class="demo-progress-bar" id="progressBar"></div> </div>
+            <div class="demo-content" id="demoContent"></div>
+            <button class="skip-btn" onclick="skipDemo()">Pular demonstração</button>
+        </div>
+    </div>
+
+    <div class="screen dashboard" id="dashboard">
+       <div class="screen-content-fullwidth"> <div id="quickAccessLeftContainer" class="quick-access-card" style="display: none;">
+                </div>
+            <div id="dashboardCenterColumn"> <div class="dashboard-header"> <div class="pet-avatar" id="petAvatar">🐕</div> <h2 class="pet-name" id="petNameDisplay">Buddy</h2> <p class="pet-subtitle">Seu companheiro fiel</p> </div>
+                <div class="status-card">
+                    <div class="status-row"> <span class="status-label">Status</span> <span class="status-value status-offline" id="systemStatus">Conectando...</span> </div>
+                    <div class="status-row"> <span class="status-label">Modo Atual</span> <span class="status-value" id="currentMode">---</span> </div>
+                    <div class="status-row"> <span class="status-label">Tempo Abertura</span> <span class="status-value" id="dashboardOpenTime">---</span> </div>
+                    <div class="status-row"> <span class="status-label">Última refeição</span> <span class="status-value" id="lastFeed">---</span> </div>
+                    <div class="status-row"> <span class="status-label">Refeições hoje</span> <span class="status-value" id="feedsToday">---</span> </div>
+                    <div class="status-row"> <span class="status-label">Distância atual</span> <span class="status-value" id="currentDistance">---</span> </div>
+                    <div class="status-row"> <span class="status-label">Porta</span> <span class="status-value" id="doorStatus">---</span> </div>
+                </div>
+                <button class="feed-btn" id="feedNowBtn" onclick="feedNow()">🍽️ Alimentar Agora</button>
+            </div>
+            <div id="quickAccessRightContainer" class="quick-access-card" style="display: none;">
+                </div>
+        </div>
+    </div>
+
+    <div class="screen monitor-screen" id="monitorScreen">
+        <div class="screen-content">
+            <div class="screen-header"><h2>Monitoramento</h2></div>
+
+            <div class="column left">
+                <div class="monitor-card">
+                    <div class="status-row"> <span class="status-label">Status Conexão</span> <span class="status-value status-offline" id="monitorStatus">Conectando...</span> </div>
+                    <div class="status-row"> <span class="status-label">Modo Operação</span> <span class="status-value" id="monitorMode">---</span> </div>
+                </div>
+                <div class="monitor-card">
+                    <h3>Proximidade <span id="proxValue" style="float:right; font-weight:600;">---</span></h3>
+                    <div class="proximity-graph">
+                        <div class="proximity-bar" id="proxBar"></div>
+                        <div class="proximity-threshold" id="proxThreshold"></div>
+                        <span class="proximity-text" id="proxThreshText">Limite: -- cm</span>
+                    </div>
+                    <div class="timer-display closed" id="doorTimer">Porta Fechada</div>
+                </div>
+                 <div class="monitor-card">
+                    <h3 style="border-bottom: none; margin-bottom: 0;">Configuração da Porta</h3>
+                    <div class="status-row"> <span class="status-label">Tempo Abertura</span> <span class="status-value" id="monitorOpenTime">---</span> </div>
+                    <div class="status-row"> <span class="status-label">Fonte Tempo</span> <span class="status-value" id="monitorOpenTimeMode">App</span> </div>
+                </div>
+            </div>
+
+            <div class="column right">
+                <div class="control-card">
+                    <h3>Ajustes do Dispositivo</h3>
+                    <div class="slider-group">
+                        <label for="feedTimeSlider">Tempo Aberto (Porta): <span id="feedTimeValue">3.5 s</span></label>
+                        <input type="range" id="feedTimeSlider" min="1000" max="10000" value="3500" step="500" oninput="updateSliderValue('feedTimeValue', this, 's')">
+                    </div>
+                    <div class="slider-group">
+                        <label for="thresholdSlider">Distância Sensor (Ativação): <span id="thresholdValue">20 cm</span></label>
+                        <input type="range" id="thresholdSlider" min="5" max="50" value="20" step="1" oninput="updateSliderValue('thresholdValue', this, 'cm')">
+                    </div>
+                    <button class="feed-btn save" onclick="saveAdjustments()">💾 Salvar Ajustes</button>
+                </div>
+                <div class="control-card">
+                    <h3>Controle Manual Imediato</h3>
+                    <button class="feed-btn manual" id="feedNowManualBtn" onclick="feedNowManual()">🔓 Abrir Porta Agora</button>
+                    <p class="settings-p" style="font-size: 12px; margin-top:10px;">Usará o "Tempo Aberto" definido acima.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="screen reports-screen" id="reportsScreen">
+        <div class="screen-content">
+            <div class="screen-header"><h2>Relatórios</h2></div>
+            <div class="control-card">
+                <h3>Resumo de Alimentações</h3>
+                <div class="report-item"> <span class="label">Total de Refeições:</span> <span class="value" id="reportTotalFeeds">0</span> </div>
+                <div class="report-item"> <span class="label">Aberturas (Dashboard):</span> <span class="value" id="reportDashboardFeeds">0</span> </div>
+                <div class="report-item"> <span class="label">Aberturas (Manual):</span> <span class="value" id="reportManualFeeds">0</span> </div>
+                <div class="report-item"> <span class="label">Aberturas (Sensor):</span> <span class="value" id="reportSensorFeeds">0</span> </div>
+                <div class="report-item"> <span class="label">Aberturas (Rotina):</span> <span class="value" id="reportRoutineFeeds">0</span> </div>
+            </div>
+            <div class="control-card">
+                <h3>Histórico Detalhado (Últimos 10)</h3>
+                <ul class="report-list" id="reportHistoryList">
+                    </ul>
+                <div class="no-reports" id="noReportsMessage" style="display: none;">Nenhum registro de alimentação ainda.</div>
+                <button class="feed-btn clear-reports-btn" onclick="clearFeedingHistory()">🗑️ Limpar Histórico</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="screen routines-screen" id="routinesScreen">
+        <div class="screen-content">
+            <div class="screen-header"><h2>Rotinas de Alimentação</h2></div>
+
+            <div class="column left">
+                 <div class="control-card" id="petHealthCard">
+                    <h3>Saúde do Pet para Sugestão (IA)</h3>
+                     <div class="input-group"> <label class="input-label" for="healthPetType">Tipo do Pet</label> <select id="healthPetType" class="settings-select"> <option value="cachorro">Cachorro</option> <option value="gato">Gato</option> </select> </div>
+                     <div class="input-group"> <label class="input-label" for="healthPetWeight">Peso do Pet (kg)</label> <input type="number" class="pet-input" id="healthPetWeight" min="0.1" step="0.1" placeholder="Ex: 5.5"> </div>
+                     <div class="input-group"> <label class="input-label" for="healthPetAge">Idade do Pet (anos)</label> <input type="number" class="pet-input" id="healthPetAge" min="0.1" step="0.1" placeholder="Ex: 2.5"> </div>
+                     <div class="input-group"> <label class="input-label" for="healthPetSize">Porte do Pet</label> <select id="healthPetSize" class="settings-select"> <option value="pequeno">Pequeno</option> <option value="medio">Médio</option> <option value="grande">Grande</option> </select> </div>
+                     <button class="feed-btn" id="suggestRoutineBtn" onclick="suggestIdealRoutineWithGemini()">💡 Sugerir Rotina com IA</button>
+                </div>
+                <div id="routineSuggestionCard" style="display: none;">
+                     <h4>Sugestão de Rotina ✨</h4> <div id="routineSuggestionResult">Clique em "Sugerir Rotina com IA" acima.</div> <button class="feed-btn" id="applyRecommendedRoutineBtn" onclick="applyAIRoutine()" style="display: none; margin-top: 15px; background-color: var(--status-green);">➕ Usar esta Sugestão de Rotina</button>
+                </div>
+            </div>
+
+            <div class="column right">
+                <div class="control-card" id="createRoutineCard">
+                    <h3>Criar/Editar Rotina Manualmente</h3>
+                     <div class="input-group">
+                        <label class="input-label">Período da Rotina</label>
+                        <div class="routine-period-display">
+                            <button class="definer-periodo-btn" onclick="startPickingRoutine()">🗓️ Definir Período</button>
+                            <input type="hidden" id="routineStartTime" data-iso-value="">
+                            <input type="hidden" id="routineEndTime" data-iso-value="">
+                        </div>
+                    </div>
+                     <div class="input-group">
+                        <label class="input-label" for="routineInterval">Intervalo (Horas e Minutos):</label>
+                        <input type="text" class="pet-input ios-picker-trigger" id="routineInterval" placeholder="Toque para definir" readonly data-type="interval">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label" for="routineOpenDuration">Tempo de Abertura (segundos):</label>
+                        <input type="text" class="pet-input ios-picker-trigger" id="routineOpenDuration" value="3 s" placeholder="Toque para definir (1-10)" readonly data-type="duration">
+                    </div>
+                    <div class="ios-picker-box" id="iosPickerBox">
+                        <div class="ios-picker-header">
+                            <button class="ios-picker-btn cancel" id="pickerCancelBtn" onclick="cancelIOSPicker()">Cancelar</button>
+                            <span class="ios-picker-title" id="iosPickerTitle">Selecione</span>
+                            <button class="ios-picker-btn set" onclick="setIOSPickerValue()">Definir</button>
+                        </div>
+                        <div class="ios-picker-body">
+                            <div class="ios-picker-wheels">
+                                <div class="ios-picker-col day" id="pickerColDay"><ul class="ios-picker-list"></ul></div>
+                                <div class="ios-picker-col month" id="pickerColMonth"><ul class="ios-picker-list"></ul></div>
+                                <div class="ios-picker-col year" id="pickerColYear"><ul class="ios-picker-list"></ul></div>
+                                <div class="ios-picker-col hour" id="pickerColHour"><ul class="ios-picker-list"></ul></div>
+                                <div class="ios-picker-col minute" id="pickerColMinute"><ul class="ios-picker-list"></ul></div>
+                                <div class="ios-picker-col duration" id="pickerColDuration"><ul class="ios-picker-list"></ul></div>
+                            </div>
+                            <div class="ios-picker-highlight"></div>
+                        </div>
+                    </div>
+                    <div class="input-group" style="display: flex; align-items: center; justify-content: space-between; margin-top: 25px; margin-bottom: 15px; padding: 10px; background-color: var(--bg-tertiary); border-radius: 8px;">
+                        <label class="input-label" for="routineIgnoreSensor" style="margin-bottom: 0; text-transform: none; color: var(--text-primary);">Ignorar Sensor na Rotina?</label>
+                        <input type="checkbox" id="routineIgnoreSensor" style="width: 22px; height: 22px; accent-color: var(--accent-primary); cursor: pointer;">
+                    </div>
+                    <button class="feed-btn save" id="saveRoutineBtn" onclick="saveRoutine()">💾 Salvar e Ativar Rotina</button>
+                </div>
+                <div class="control-card" id="activeRoutineCard" style="display: none;">
+                     <h3>Rotina Ativa</h3> <div class="status-row"> <span class="status-label">Início:</span> <span class="status-value small-date" id="routineActiveStart">--</span> </div> <div class="status-row"> <span class="status-label">Fim:</span> <span class="status-value small-date" id="routineActiveEnd">--</span> </div> <div class="status-row"> <span class="status-label">Próxima Refeição:</span> <span class="status-value" id="routineNextFeed" style="color: var(--status-green); font-weight: bold;">--:--:--</span> </div> <div class="status-row"> <span class="status-label">Intervalo Configurado:</span> <span class="status-value" id="routineActiveInterval">--</span> </div> <div class="status-row"> <span class="status-label">Duração Abertura Porta:</span> <span class="status-value" id="routineActiveDuration">--</span> </div> <div class="status-row"> <span class="status-label">Sensor Durante Rotina:</span> <span class="status-value" id="routineActiveSensor">--</span> </div> <button class="feed-btn reset-btn" onclick="deactivateRoutine()">🗑️ Desativar Rotina</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="screen settings-screen" id="settingsScreen">
+        <div class="screen-content">
+            <div class="screen-header"><h2>Configurações</h2></div>
+
+            <div class="column left">
+                <div class="control-card">
+                    <h3>Informações do Pet</h3>
+                    <div class="input-group"> <label class="input-label" for="settingsPetNameInput">Nome do Pet</label> <input type="text" class="pet-input" id="settingsPetNameInput" maxlength="20"> </div>
+                    <div class="input-group"> <label class="input-label">Ícone do Pet</label> <div class="pet-selector" id="settingsPetSelector"></div> </div>
+                </div>
+                <div class="control-card">
+                    <h3>Aparência (Tema)</h3>
+                    <div class="theme-selector">
+                        <label class="theme-option"> <input type="radio" name="theme" value="dark" onchange="changeTheme(this.value)"> <div class="theme-preview dark">Aa</div> <span>Escuro</span> </label>
+                        <label class="theme-option"> <input type="radio" name="theme" value="light" onchange="changeTheme(this.value)"> <div class="theme-preview light">Aa</div> <span>Claro</span> </label>
+                        <label class="theme-option"> <input type="radio" name="theme" value="blue" onchange="changeTheme(this.value)"> <div class="theme-preview blue">Aa</div> <span>Azul</span> </label>
+                        <label class="theme-option"> <input type="radio" name="theme" value="gradient" onchange="changeTheme(this.value)"> <div class="theme-preview gradient">Aa</div> <span>Roxo</span> </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="column right">
+                <div class="control-card">
+                    <h3>Personalizar Tela de Início</h3>
+                    <p class="settings-p" style="margin-bottom: 15px; text-align: left; font-size: 14px;">Adicione atalhos para suas telas favoritas diretamente na tela de Início.</p>
+                    <div class="input-group">
+                        <label class="input-label" for="quickAccessLeftSelect">Painel Esquerdo</label>
+                        <select id="quickAccessLeftSelect" class="settings-select">
+                            <option value="none">Nenhum</option>
+                            <option value="monitorScreen">Monitor</option>
+                            <option value="reportsScreen">Relatório</option>
+                            <option value="routinesScreen">Rotina</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label" for="quickAccessRightSelect">Painel Direito</label>
+                        <select id="quickAccessRightSelect" class="settings-select">
+                            <option value="none">Nenhum</option>
+                            <option value="monitorScreen">Monitor</option>
+                            <option value="reportsScreen">Relatório</option>
+                            <option value="routinesScreen">Rotina</option>
+                        </select>
+                    </div>
+                </div>
+                 <div class="control-card">
+                    <h3>Dados</h3>
+                    <button class="feed-btn reset-btn" onclick="factoryReset()">⚠️ Resetar App</button>
+                     <p class="settings-p">Isso limpará todos os dados salvos e voltará à tela inicial.</p>
+                </div>
+            </div>
+
+            <div class="save-all-btn-container">
+                 <button class="feed-btn save" onclick="saveSettings()">💾 Salvar Todas as Configurações</button>
+            </div>
+
+            <div class="about-btn-container">
+                <button class="btn-sobre" id="aboutPetFeederBtn" onclick="openAboutPage()">ℹ️ Sobre o PetFeeder</button>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="nav-bar" id="navBar" style="display: none;">
+        <div class="nav-item active" onclick="navigateTo('dashboard', this)">
+            <span class="nav-icon">🏠</span>
+            <span class="nav-text">Início</span>
+        </div>
+        <div class="nav-item" onclick="navigateTo('monitorScreen', this)">
+            <span class="nav-icon">📊</span>
+            <span class="nav-text">Monitorar</span>
+        </div>
+        <div class="nav-item" onclick="navigateTo('reportsScreen', this)">
+            <span class="nav-icon">📈</span>
+            <span class="nav-text">Relatórios</span>
+        </div>
+        <div class="nav-item" onclick="navigateTo('routinesScreen', this)">
+            <span class="nav-icon">⏰</span>
+            <span class="nav-text">Rotinas</span>
+        </div>
+        <div class="nav-item" onclick="navigateTo('settingsScreen', this)">
+            <span class="nav-icon">⚙️</span>
+            <span class="nav-text">Config.</span>
+        </div>
+    </div>
+
+    <div class="notification" id="notification"> <div class="notification-content"> <span class="notification-icon" id="notificationIcon">✅</span> <span class="notification-text" id="notificationText">Notificação Padrão.</span> </div> </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyClMqeoGTnDv71Qnp-kPs9Yxifqc5_R7og",
+            authDomain: "petfeed-se.firebaseapp.com",
+            databaseURL: "https://petfeed-se-default-rtdb.firebaseio.com",
+            projectId: "petfeed-se",
+            storageBucket: "petfeed-se.firebasestorage.app",
+            messagingSenderId: "651255070724",
+            appId: "1:651255070724:web:248b534e42c5887b2b3551",
+            measurementId: "G-DVH6XGRDBX"
+        };
+        let firebaseApp, firebaseDb;
+        try {
+            if (firebaseConfig.apiKey && firebaseConfig.apiKey !== "AIzaSyCzsGC2_ADfkBWSunTQBzEeCAbh8E-TO0o" && firebaseConfig.projectId) {
+                 firebaseApp = firebase.initializeApp(firebaseConfig);
+                 firebaseDb = firebase.database();
+                 console.log("Firebase Inicializado com sucesso!");
+            } else {
+                 console.warn("Configuração do Firebase não preenchida ou inválida. Firebase NÃO inicializado.");
+                 firebaseDb = null;
+            }
+        } catch (error) {
+            console.error("Erro ao inicializar Firebase:", error.message);
+            firebaseDb = null;
+        }
+
+        let currentScreenId = 'welcomeScreen';
+        let petName = localStorage.getItem('petName') || '';
+        let petEmoji = localStorage.getItem('petEmoji') || '';
+        let petImageUrl = localStorage.getItem('petImageUrl') || '';
+        let currentTheme = localStorage.getItem('appTheme') || 'dark';
+        let selectedSettingsEmoji = petEmoji;
+        let isOnline = false;
+        let doorOpenEndTime = 0;
+        let timerInterval, demoInterval;
+        let firebaseData = { estado: {}, metricas: {}, comando: {} };
+        let activeRoutine = null;
+        let routineCountdownInterval = null;
+        let quickAccessLeft = localStorage.getItem('quickAccessLeft') || 'none';
+        let quickAccessRight = localStorage.getItem('quickAccessRight') || 'none';
+        let firebaseListeners = [];
+        let currentPickerInput = null;
+        let pickerState = null;
+        const pickerBox = document.getElementById('iosPickerBox');
+        const pickerTitle = document.getElementById('iosPickerTitle');
+        const pickerCancelBtn = document.getElementById('pickerCancelBtn');
+        const wheelCols = {
+            Day: document.getElementById('pickerColDay').querySelector('ul'),
+            Month: document.getElementById('pickerColMonth').querySelector('ul'),
+            Year: document.getElementById('pickerColYear').querySelector('ul'),
+            Hour: document.getElementById('pickerColHour').querySelector('ul'),
+            Minute: document.getElementById('pickerColMinute').querySelector('ul'),
+            Duration: document.getElementById('pickerColDuration').querySelector('ul'),
+        };
+        const itemHeight = 44;
+        const pickerHeight = 216;
+        const baseOffset = (pickerHeight / 2) - (itemHeight / 2);
+        const monthsFull = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+        const petOptionsSetup = [ { emoji: "🐕", name: "Cachorro" }, { emoji: "🐱", name: "Gato" } ];
+        const petOptionsSettings = [ { emoji: "🐕", name: "Cachorro" }, { emoji: "🐱", name: "Gato" }, { emoji: "🖼️", name: "Imagem URL" } ];
+        const demoSteps = [ { icon: '🔍', title: 'Tudo Pronto!', description: 'Seu PetFeeder está configurado.' }, { icon: '📊', title: 'Monitoramento', description: 'Acompanhe status, distância e refeições.' }, { icon: '⏰', title: 'Alimentação Fácil', description: 'Alimente agora ou crie rotinas.' }, { icon: '⚙️', title: 'Ajustes Finos', description: 'Personalize tudo na tela de Configurações.' }, { icon: '🎉', title: 'Bem-vindo!', description: 'Aproveite a alimentação inteligente!' } ];
+
+        function createPetOption(pet, onClickHandler) { const div = document.createElement('div'); div.className = 'pet-option'; div.dataset.pet = pet.emoji; div.dataset.name = pet.name; div.onclick = () => onClickHandler(div); div.innerHTML = `<div class="pet-option-emoji">${pet.emoji}</div><div class="pet-option-name">${pet.name}</div>`; return div; }
+        function populatePetSelectors() { const setupSelector = document.getElementById('setupPetSelector'); const settingsSelector = document.getElementById('settingsPetSelector'); if(setupSelector) { setupSelector.innerHTML = ''; petOptionsSetup.forEach(pet => setupSelector.appendChild(createPetOption(pet, selectPetTypeSetup))); } if(settingsSelector) { settingsSelector.innerHTML = ''; petOptionsSettings.forEach(pet => settingsSelector.appendChild(createPetOption(pet, selectPetTypeSettings))); } }
+        function selectPetTypeSetup(element) { document.querySelectorAll('#setupPetSelector .pet-option').forEach(opt => opt.classList.remove('selected')); element.classList.add('selected'); petEmoji = element.dataset.pet; petImageUrl = ''; checkSetupComplete(); }
+        function selectPetTypeSettings(element) { document.querySelectorAll('#settingsPetSelector .pet-option').forEach(opt => opt.classList.remove('selected')); element.classList.add('selected'); selectedSettingsEmoji = element.dataset.pet; if (selectedSettingsEmoji === "🖼️") { promptForImageUrl(); } else { petImageUrl = ''; petEmoji = selectedSettingsEmoji; } }
+        function promptForImageUrl() { const url = prompt("Cole a URL da imagem:", petImageUrl || ""); if (url && (url.startsWith('http://') || url.startsWith('https://'))) { petImageUrl = url; petEmoji = "🖼️"; selectedSettingsEmoji = "🖼️"; document.querySelectorAll('#settingsPetSelector .pet-option').forEach(opt => opt.classList.toggle('selected', opt.dataset.pet === "🖼️")); } else { const prev = localStorage.getItem('petEmoji') || '🐕'; showNotification(url ? "❌ URL Inválida" : "ℹ️ Cancelado", "Usando anterior."); selectedSettingsEmoji = prev; petEmoji = prev; petImageUrl = localStorage.getItem('petImageUrl') || ''; document.querySelectorAll('#settingsPetSelector .pet-option').forEach(opt => opt.classList.toggle('selected', opt.dataset.pet === petEmoji)); } }
+        function checkSetupComplete() { const btn = document.getElementById('setupContinueBtn'); if(!btn) return; const nameValue = document.getElementById('petNameInput').value.trim(); btn.disabled = !(nameValue.length >= 2 && petEmoji && petEmoji !== '🖼️'); if (!btn.disabled) { petName = nameValue; } }
+        document.getElementById('petNameInput')?.addEventListener('input', checkSetupComplete);
+        document.getElementById('petNameInput')?.addEventListener('keypress', (e) => (e.key === 'Enter' && !document.getElementById('setupContinueBtn')?.disabled) && finishSetup());
+        document.getElementById('settingsPetNameInput')?.addEventListener('keypress', (e) => (e.key === 'Enter') && saveSettings());
+        function navigateTo(screenId, navElement = null) { document.querySelectorAll('.screen.active').forEach(s => s.classList.remove('active')); const nextScreenElement = document.getElementById(screenId); if(nextScreenElement) { void nextScreenElement.offsetWidth; nextScreenElement.classList.add('active'); } else { console.error("Screen not found:", screenId); document.getElementById('dashboard')?.classList.add('active'); currentScreenId = 'dashboard'; } currentScreenId = screenId; const navBar = document.getElementById('navBar'); const showNav = !['welcomeScreen', 'setupScreen', 'demoScreen'].includes(screenId); if(navBar) navBar.style.display = showNav ? 'flex' : 'none'; if (showNav && navBar) { navBar.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active')); if (navElement) navElement.classList.add('active'); else { navBar.querySelectorAll('.nav-item').forEach(item => { if(item.onclick && item.onclick.toString().includes(`'${screenId}'`)) item.classList.add('active'); }); } } if (screenId !== 'demoScreen' && demoInterval) { clearTimeout(demoInterval); demoInterval = null; } if (firebaseDb && showNav) { startFirebaseListeners(); } if (screenId === 'reportsScreen') renderReports(); else if (screenId === 'settingsScreen') loadSettings(); else if (screenId === 'routinesScreen') { loadRoutine(); cancelIOSPicker(); } else { cancelIOSPicker(); } if(screenId === 'dashboard') updateDashboardQuickAccess(); }
+        function finishSetup() { localStorage.setItem('petName', petName); localStorage.setItem('petEmoji', petEmoji); localStorage.setItem('petImageUrl', ''); selectedSettingsEmoji = petEmoji; updatePetInfo(); startDemo(); }
+        function startDemo() { navigateTo('demoScreen'); runDemoStep(0); }
+        function runDemoStep(stepIndex) { clearTimeout(demoInterval); if (stepIndex >= demoSteps.length) { finishDemo(); return; } const progressBar = document.getElementById('progressBar'); const demoContentEl = document.getElementById('demoContent'); const currentStep = demoSteps[stepIndex]; const progress = ((stepIndex + 1) / demoSteps.length) * 100; if(progressBar) progressBar.style.width = progress + '%'; if(demoContentEl) demoContentEl.innerHTML = `<div class="demo-icon">${currentStep.icon}</div><h3 class="demo-title">${currentStep.title}</h3><p class="demo-description">${currentStep.description}</p>`; demoInterval = setTimeout(() => runDemoStep(stepIndex + 1), 2500); }
+        function skipDemo() { clearTimeout(demoInterval); finishDemo(); }
+        function finishDemo() { navigateTo('dashboard'); }
+        function updatePetInfo() { const petAvatar = document.getElementById('petAvatar'); const petNameDisplay = document.getElementById('petNameDisplay'); const petNameInputEl = document.getElementById('petNameInput'); if(petNameDisplay) petNameDisplay.textContent = petName || 'Seu Pet'; if(petNameInputEl) petNameInputEl.value = petName; if (petAvatar) { if (petEmoji === '🖼️' && petImageUrl) { petAvatar.textContent = ''; petAvatar.style.backgroundImage = `url(${CSS.escape(petImageUrl)})`; petAvatar.style.fontSize = '0'; } else { petAvatar.textContent = petEmoji || '?'; petAvatar.style.backgroundImage = 'none'; petAvatar.style.fontSize = '40px'; } } const setupPetSelector = document.getElementById('setupPetSelector'); if (setupPetSelector) { setupPetSelector.querySelectorAll('.pet-option').forEach(opt => { opt.classList.toggle('selected', opt.dataset.pet === petEmoji && petEmoji !== '🖼️'); }); } checkSetupComplete(); }
+        function loadSettings() { const settingsPetNameInput = document.getElementById('settingsPetNameInput'); if(settingsPetNameInput) settingsPetNameInput.value = petName; selectedSettingsEmoji = petEmoji; petImageUrl = localStorage.getItem('petImageUrl') || ''; const settingsPetSelector = document.getElementById('settingsPetSelector'); if(settingsPetSelector){ settingsPetSelector.querySelectorAll('.pet-option').forEach(opt => { opt.classList.toggle('selected', opt.dataset.pet === petEmoji); }); } const themeRadio = document.querySelector(`.theme-option input[value="${currentTheme}"]`); if(themeRadio) themeRadio.checked = true; document.getElementById('quickAccessLeftSelect').value = quickAccessLeft; document.getElementById('quickAccessRightSelect').value = quickAccessRight; }
+        function saveSettings() { const newName = document.getElementById('settingsPetNameInput').value.trim(); if (newName.length < 2 && document.getElementById('settingsPetNameInput').value !== '') { showNotification('⚠️ Erro', 'O nome do pet deve ter pelo menos 2 letras.'); return; } petName = (newName === '') ? '' : newName; if(selectedSettingsEmoji !== "🖼️") { petEmoji = selectedSettingsEmoji; petImageUrl = ''; } else if (!petImageUrl) { petEmoji = localStorage.getItem('petEmoji') || '🐕'; showNotification('🖼️ Info', 'Nenhuma URL de imagem. Usando emoji anterior.'); } else { petEmoji = "🖼️"; } localStorage.setItem('petName', petName); localStorage.setItem('petEmoji', petEmoji); localStorage.setItem('petImageUrl', petImageUrl); localStorage.setItem('appTheme', currentTheme); quickAccessLeft = document.getElementById('quickAccessLeftSelect').value; quickAccessRight = document.getElementById('quickAccessRightSelect').value; localStorage.setItem('quickAccessLeft', quickAccessLeft); localStorage.setItem('quickAccessRight', quickAccessRight); updatePetInfo(); updateDashboardQuickAccess(); showNotification('✅ Salvo!', 'Configurações atualizadas.'); navigateTo('dashboard'); }
+        function showCustomConfirm(message, onConfirm, onCancel) { const existingModal = document.getElementById('customConfirmModal'); if (existingModal) existingModal.remove(); const modal = document.createElement('div'); modal.id = 'customConfirmModal'; modal.style.cssText = `position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 5000; padding: 20px; opacity: 0; transition: opacity 0.3s;`; const modalContent = document.createElement('div'); modalContent.style.cssText = `background: var(--bg-secondary); color: var(--text-primary); padding: 25px; border-radius: 16px; text-align: center; max-width: 300px; box-shadow: 0 5px 20px rgba(0,0,0,0.3); transform: scale(0.9); transition: transform 0.3s;`; const messageP = document.createElement('p'); messageP.textContent = message; messageP.style.marginBottom = '20px'; messageP.style.fontSize = '16px'; messageP.style.lineHeight = '1.5'; const btnConfirm = document.createElement('button'); btnConfirm.textContent = 'Confirmar'; btnConfirm.className = 'feed-btn'; btnConfirm.style.backgroundColor = 'var(--status-red)'; btnConfirm.style.marginRight = '10px'; btnConfirm.onclick = () => { onConfirm(); modal.style.opacity = '0'; setTimeout(() => modal.remove(), 300); }; const btnCancel = document.createElement('button'); btnCancel.textContent = 'Cancelar'; btnCancel.className = 'feed-btn'; btnCancel.style.backgroundColor = 'var(--bg-quaternary)'; btnCancel.style.color = 'var(--text-primary)'; btnCancel.onclick = () => { if(onCancel) onCancel(); modal.style.opacity = '0'; setTimeout(() => modal.remove(), 300); }; modalContent.appendChild(messageP); modalContent.appendChild(btnConfirm); modalContent.appendChild(btnCancel); modal.appendChild(modalContent); document.body.appendChild(modal); setTimeout(() => { modal.style.opacity = '1'; modalContent.style.transform = 'scale(1)'; }, 10); }
+        function factoryReset() { showCustomConfirm("Tem certeza que deseja resetar o aplicativo?", () => { stopFirebaseListeners(); localStorage.clear(); petName = ''; petEmoji = ''; petImageUrl = ''; currentTheme = 'dark'; quickAccessLeft = 'none'; quickAccessRight = 'none'; firebaseData = { estado: {}, metricas: {}, comando: {} }; isOnline = false; activeRoutine = null; clearInterval(timerInterval); clearInterval(routineCountdownInterval); const petNameInputEl = document.getElementById('petNameInput'); if(petNameInputEl) petNameInputEl.value = ''; document.querySelectorAll('.pet-option').forEach(opt => opt.classList.remove('selected')); applyTheme('dark'); updateDashboardQuickAccess(); showNotification('🔄 Resetado', 'App restaurado.'); navigateTo('welcomeScreen'); setTimeout(() => { window.location.reload(); }, 500); }); }
+        function changeTheme(theme) { currentTheme = theme; applyTheme(theme); localStorage.setItem('appTheme', theme); }
+        function applyTheme(theme) { document.body.dataset.theme = theme; const themeRadio = document.querySelector(`.theme-option input[value="${theme}"]`); if (themeRadio) themeRadio.checked = true; }
+        function showNotification(iconOrTitle, text) { const n = document.getElementById('notification'); const i = document.getElementById('notificationIcon'); const t = document.getElementById('notificationText'); if (!n || !i || !t) return; i.textContent = text ? iconOrTitle : 'ℹ️'; t.textContent = text ? text : iconOrTitle; n.classList.add('show'); setTimeout(() => { n.classList.remove('show'); }, 3000); }
+        function updateSliderValue(id, slider, unit = '') { const d = document.getElementById(id); if(d) d.textContent = `${slider.value / (unit === 's' ? 1000 : 1)} ${unit}`; }
+        function stopFirebaseListeners() { if (!firebaseDb) return; firebaseListeners.forEach(({ ref, type, callback }) => { if (ref && typeof ref.off === 'function') { ref.off(type, callback); } }); firebaseListeners = []; isOnline = false; updateUI(); }
+        function startFirebaseListeners() { if (!firebaseDb || firebaseListeners.length > 0) { if(firebaseListeners.length > 0) updateUI(); return; } const setupListener = (path, dataKey, isEstado = false) => { const ref = firebaseDb.ref(path); const callback = (snapshot) => { if (snapshot.exists()) { firebaseData[dataKey] = snapshot.val(); if (isEstado && firebaseData.estado && typeof firebaseData.estado.distancia_cm === 'string') { firebaseData.estado.distancia_cm = parseFloat(firebaseData.estado.distancia_cm); } if (!isOnline && dataKey === 'estado') isOnline = true; updateUI(); if (dataKey === 'metricas') renderReports(); } else { firebaseData[dataKey] = (dataKey === 'estado' || dataKey === 'comando' || dataKey === 'metricas') ? {} : null; updateUI(); } }; ref.on('value', callback, (error) => { if (isEstado) { isOnline = false; updateUI(); } }); firebaseListeners.push({ ref: ref, type: 'value', callback: callback }); }; const connectionRef = firebaseDb.ref('.info/connected'); const connectionCallback = (snapshot) => { const newOnlineStatus = snapshot.val() === true; if (isOnline !== newOnlineStatus) { isOnline = newOnlineStatus; if (!isOnline) { firebaseData = { estado: {}, metricas: {}, comando: {} }; } updateUI(); } }; connectionRef.on('value', connectionCallback, () => { isOnline = false; updateUI(); }); firebaseListeners.push({ ref: connectionRef, type: 'value', callback: connectionCallback }); setupListener('/estado', 'estado', true); setupListener('/metricas', 'metricas'); setupListener('/comando', 'comando'); }
+        async function sendFirebaseCommand(path, value) {
+            if (!firebaseDb) {
+                showNotification("❌ Firebase", "Não conectado.");
+                return Promise.reject("Firebase não inicializado");
+            }
+            showNotification('📡 Enviando...', 'Aguardando dispositivo...');
+
+            const messages = {
+                '/comando/abrir': 'A porta será aberta em breve.',
+                '/comando/tempo_remoto_ms': 'Tempo de abertura da porta atualizado.',
+                '/comando/distancia_threshold_cm': 'Distância de ativação do sensor atualizada.'
+            };
+
+            try {
+                await firebaseDb.ref(path).set(value);
+                const successMessage = messages[path] || `Comando para ${path} enviado.`;
+                showNotification('✅ Enviado!', successMessage);
+                return Promise.resolve();
+            } catch (error) {
+                showNotification('❌ Erro Firebase', 'Falha ao enviar comando.');
+                return Promise.reject(error);
+            }
+        }
+        function feedNow() { sendFirebaseCommand('/comando/abrir', true).then(() => logFeedingEvent('Dashboard')); }
+        function feedNowManual() { const tempo = parseInt(document.getElementById('feedTimeSlider')?.value); sendFirebaseCommand('/comando/tempo_remoto_ms', tempo) .then(() => sendFirebaseCommand('/comando/abrir', true)) .then(() => logFeedingEvent('Manual')); }
+        function saveAdjustments() { if (!firebaseDb) { showNotification("❌ Firebase", "Não conectado."); return; } const openTimeMs = parseInt(document.getElementById('feedTimeSlider')?.value); const thresholdCm = parseInt(document.getElementById('thresholdSlider')?.value); showNotification('💾 Salvando...', 'Enviando ajustes...'); const updates = { '/comando/tempo_remoto_ms': openTimeMs, '/comando/distancia_threshold_cm': thresholdCm }; firebaseDb.ref().update(updates) .then(() => showNotification('✅ Salvo!', 'Ajustes enviados.')) .catch(() => showNotification('❌ Erro Firebase', 'Falha ao salvar.')); }
+        function loadFirebaseData() { if (!firebaseDb) { isOnline = false; firebaseData = { estado: {}, metricas: {}, comando: {} }; updateUI(); } }
+        function updateUI() {
+            const els = {
+                sysStat: document.getElementById('systemStatus'), monStat: document.getElementById('monitorStatus'),
+                last: document.getElementById('lastFeed'), today: document.getElementById('feedsToday'),
+                dist: document.getElementById('currentDistance'), mode: document.getElementById('currentMode'),
+                monMode: document.getElementById('monitorMode'), proxVal: document.getElementById('proxValue'),
+                proxBar: document.getElementById('proxBar'), proxTh: document.getElementById('proxThreshold'),
+                proxTxt: document.getElementById('proxThreshText'), door: document.getElementById('doorStatus'),
+                timer: document.getElementById('doorTimer'), btn1: document.getElementById('feedNowBtn'),
+                btn2: document.getElementById('feedNowManualBtn'),
+                dashOpenTime: document.getElementById('dashboardOpenTime'),
+                monOpenTime: document.getElementById('monitorOpenTime'),
+                monOpenTimeMode: document.getElementById('monitorOpenTimeMode')
+            };
+            const { estado, metricas, comando } = firebaseData;
+            let isServoCurrentlyActive = estado?.evento?.toLowerCase().includes('abert');
+
+            if (isOnline) {
+                const distVal = parseFloat(estado?.distancia_cm ?? 999.0);
+                const refeicoes = metricas?.refeicoes_hoje ?? 0;
+                const evento = estado?.evento ?? 'Online';
+                const currentModeVal = estado?.modo ?? comando?.origem ?? '---';
+                const threshold = parseInt(comando?.distancia_threshold_cm ?? estado?.limite_sensor_cm ?? 20);
+                const tempoRemoto = parseInt(comando?.tempo_remoto_ms ?? estado?.tempo_aberto_ms ?? 3500);
+                const tempoRemotoSec = (tempoRemoto / 1000).toFixed(1) + ' s';
+
+                if(els.sysStat) { els.sysStat.textContent = evento.substring(0, 18) + (evento.length > 18 ? '...' : ''); els.sysStat.className = 'status-value status-online'; }
+                if(els.monStat) { els.monStat.textContent = 'Online'; els.monStat.className = 'status-value status-online'; }
+                const capMode = currentModeVal.charAt(0).toUpperCase() + currentModeVal.slice(1);
+                if(els.mode) els.mode.textContent = capMode;
+                if(els.monMode) els.monMode.textContent = capMode;
+                if(els.today) els.today.textContent = refeicoes;
+                const distText = distVal < 999 ? `${distVal.toFixed(1)} cm` : '---';
+                if(els.dist) els.dist.textContent = distText;
+                if(els.proxVal) els.proxVal.textContent = distText;
+                if(els.proxBar && els.proxTh && els.proxTxt) { const maxDist = 60; const distPercent = distVal >= maxDist || distVal >= 999 ? 100 : Math.min(100, (distVal / maxDist) * 100); els.proxBar.style.width = `${distPercent}%`; els.proxBar.style.background = (distVal < threshold && distVal < 999) ? 'var(--status-green)' : 'var(--accent-primary)'; els.proxTh.style.right = `${Math.max(0, Math.min(100, 100 - (threshold / maxDist) * 100))}%`; els.proxTxt.textContent = `Limite: ${threshold} cm`; }
+                const threshSlider = document.getElementById('thresholdSlider');
+                if(threshSlider && document.activeElement !== threshSlider && parseInt(threshSlider.value) !== threshold) { threshSlider.value = threshold; updateSliderValue('thresholdValue', threshSlider, 'cm'); }
+                const timeSlider = document.getElementById('feedTimeSlider');
+                if(timeSlider && document.activeElement !== timeSlider && parseInt(timeSlider.value) !== tempoRemoto) { timeSlider.value = tempoRemoto; updateSliderValue('feedTimeValue', timeSlider, 's'); }
+                if(els.last){ const ts = metricas?.ultima_refeicao_timestamp; els.last.textContent = ts > 0 ? new Date(ts).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : 'Nenhuma'; }
+                if(els.door) { els.door.textContent = isServoCurrentlyActive ? 'Aberta' : 'Fechada'; els.door.style.color = isServoCurrentlyActive ? 'var(--status-green)' : 'var(--status-red)'; if (isServoCurrentlyActive && doorOpenEndTime === 0) { doorOpenEndTime = Date.now() + (estado?.tempo_aberto_ms || tempoRemoto); startDoorTimer(doorOpenEndTime); } else if (!isServoCurrentlyActive) { stopDoorTimer(); } }
+                if(els.btn1) els.btn1.disabled = isServoCurrentlyActive;
+                if(els.btn2) els.btn2.disabled = isServoCurrentlyActive;
+                if(els.dashOpenTime) els.dashOpenTime.textContent = tempoRemotoSec;
+                if(els.monOpenTime) els.monOpenTime.textContent = tempoRemotoSec;
+                if(els.monOpenTimeMode) els.monOpenTimeMode.textContent = "App";
+
+            } else {
+                if(els.sysStat) { els.sysStat.textContent = 'Offline'; els.sysStat.className = 'status-value status-offline'; }
+                if(els.monStat) { els.monStat.textContent = 'Offline'; els.monStat.className = 'status-value status-offline'; }
+                [els.last, els.today, els.dist, els.mode, els.monMode, els.proxVal, els.door, els.dashOpenTime, els.monOpenTime].forEach(el => { if(el) el.textContent = '---';});
+                if(els.monOpenTimeMode) els.monOpenTimeMode.textContent = "---";
+                if(els.proxBar) els.proxBar.style.width = '0%';
+                if(els.proxTh) els.proxTh.style.right = '0%';
+                if(els.proxTxt) els.proxTxt.textContent = 'Limite: -- cm';
+                stopDoorTimer();
+                if(els.btn1) els.btn1.disabled = true;
+                if(els.btn2) els.btn2.disabled = true;
+            }
+            updateDashboardQuickAccess();
+        }
+        function startDoorTimer(endTime) { clearInterval(timerInterval); const timerDisplay = document.getElementById('doorTimer'); if (!timerDisplay) return; function update() { const timeLeft = Math.round((endTime - Date.now()) / 1000); if (timeLeft <= 0) { timerDisplay.textContent = 'Porta Fechada'; timerDisplay.className = 'timer-display closed'; clearInterval(timerInterval); doorOpenEndTime = 0; } else { timerDisplay.textContent = `Aberta: ${timeLeft}s`; timerDisplay.className = 'timer-display open'; } } update(); timerInterval = setInterval(update, 1000); }
+        function stopDoorTimer() { clearInterval(timerInterval); const timerDisplay = document.getElementById('doorTimer'); if (timerDisplay) { timerDisplay.textContent = 'Porta Fechada'; timerDisplay.className = 'timer-display closed'; } doorOpenEndTime = 0; }
+        function logFeedingEvent(type) { let history = JSON.parse(localStorage.getItem('feedingHistory')) || []; history.unshift({ type: type, timestamp: Date.now() }); if (history.length > 50) history.pop(); localStorage.setItem('feedingHistory', JSON.stringify(history)); if (currentScreenId === 'reportsScreen') renderReports(); }
+        function renderReports() { const history = JSON.parse(localStorage.getItem('feedingHistory')) || []; const els = { t:document.getElementById('reportTotalFeeds'), d:document.getElementById('reportDashboardFeeds'), m:document.getElementById('reportManualFeeds'), s:document.getElementById('reportSensorFeeds'), r:document.getElementById('reportRoutineFeeds'), l:document.getElementById('reportHistoryList'), n:document.getElementById('noReportsMessage') }; let c = { d:0, m:0, r:0, s:0 }; history.forEach(e => { const typeKey = e.type?.[0]?.toLowerCase(); if(c.hasOwnProperty(typeKey)) c[typeKey]++; }); if(els.t) els.t.textContent = history.length; if(els.d) els.d.textContent = c.d; if(els.m) els.m.textContent = c.m; if(els.r) els.r.textContent = c.r; if(els.s) els.s.textContent = c.s; if(els.l) { els.l.innerHTML = ''; if (history.length === 0) { if(els.n) els.n.style.display = 'block'; } else { if(els.n) els.n.style.display = 'none'; history.slice(0, 10).forEach(e => { const i = document.createElement('li'); i.className = 'report-list-item'; const d = new Date(e.timestamp); i.innerHTML = `<span class="type">${e.type}</span> <span class="time">${d.toLocaleDateString()} ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>`; els.l.appendChild(i); }); } } }
+        function clearFeedingHistory() { showCustomConfirm("Limpar todo o histórico?", () => { localStorage.removeItem('feedingHistory'); renderReports(); showNotification("🗑️ Histórico Limpo."); }); }
+
+        function getDaysInMonth(year, month) { return new Date(year, month + 1, 0).getDate(); }
+
+        function populateWheel(ul, start, end, formatFn, padding = 3) {
+            ul.innerHTML = '';
+            for (let p = 0; p < padding; p++) { const li = document.createElement('li'); li.innerHTML = '&nbsp;'; ul.appendChild(li); }
+            for (let i = start; i <= end; i++) {
+                const li = document.createElement('li');
+                li.textContent = formatFn ? formatFn(i) : i;
+                li.dataset.value = i;
+                ul.appendChild(li);
+            }
+            for (let p = 0; p < padding; p++) { const li = document.createElement('li'); li.innerHTML = '&nbsp;'; ul.appendChild(li); }
+        }
+
+        function updateDayWheel() {
+            const year = getSelectedValueFromWheel(wheelCols.Year);
+            const month = getSelectedValueFromWheel(wheelCols.Month);
+            const currentDay = getSelectedValueFromWheel(wheelCols.Day);
+            if(year === null || month === null || currentDay === null) return;
+            const days = getDaysInMonth(year, month);
+            populateWheel(wheelCols.Day, 1, days, (d) => `${d}`);
+            setWheelValue(wheelCols.Day, Math.min(currentDay, days), false);
+        }
+
+        function updateWheelsUI(value, type) {
+            const now = new Date();
+            const currentYear = now.getFullYear();
+
+            if (type === 'datetime') {
+                const date = value;
+                const year = date ? date.getFullYear() : now.getFullYear();
+                const month = date ? date.getMonth() : now.getMonth();
+                const day = date ? date.getDate() : now.getDate();
+                const hour = date ? date.getHours() : now.getHours();
+                const minute = date ? date.getMinutes() : now.getMinutes();
+                populateWheel(wheelCols.Day, 1, getDaysInMonth(year, month), (d) => `${d}`);
+                populateWheel(wheelCols.Month, 0, 11, (m) => monthsFull[m]);
+                populateWheel(wheelCols.Year, currentYear - 5, currentYear + 10);
+                populateWheel(wheelCols.Hour, 0, 23, (h) => String(h).padStart(2, '0'));
+                populateWheel(wheelCols.Minute, 0, 59, (m) => String(m).padStart(2, '0'));
+                setWheelValue(wheelCols.Day, day, false);
+                setWheelValue(wheelCols.Month, month, false);
+                setWheelValue(wheelCols.Year, year, false);
+                setWheelValue(wheelCols.Hour, hour, false);
+                setWheelValue(wheelCols.Minute, minute, false);
+            } else if (type === 'interval') {
+                const hour = value.hour || 0;
+                const minute = value.minute || 0;
+                populateWheel(wheelCols.Hour, 0, 23, (h) => `${h} h`);
+                populateWheel(wheelCols.Minute, 0, 59, (m) => `${m} min`);
+                setWheelValue(wheelCols.Hour, hour, false);
+                setWheelValue(wheelCols.Minute, minute, false);
+            } else if (type === 'duration') {
+                populateWheel(wheelCols.Duration, 1, 10, (d) => `${d} s`);
+                setWheelValue(wheelCols.Duration, value, false);
+            }
+        }
+
+        function setWheelValue(ul, value, useTransition = true) {
+            if(!ul) { console.error("Wheel UL not found!"); return; }
+            const items = Array.from(ul.children);
+            const PADDING = 3;
+            let index = items.findIndex(li => li.dataset.value && parseInt(li.dataset.value) === value);
+
+            if (index === -1) index = PADDING;
+
+            const yOffset = baseOffset - (index * itemHeight);
+            ul.style.transition = useTransition ? 'transform 0.25s ease-out' : 'none';
+            ul.style.transform = `translateY(${yOffset}px) translateZ(0)`;
+            updateItemStyles(ul, yOffset);
+        }
+
+        function updateItemStyles(ul, yOffset) {
+            if(!ul) return;
+             Array.from(ul.children).forEach((li, index) => {
+                const itemCenterY = yOffset + (index * itemHeight) + (itemHeight / 2);
+                const diff = Math.abs(itemCenterY - (pickerHeight / 2));
+
+                if (diff < itemHeight / 2.5) {
+                    li.style.opacity = 1.0;
+                    li.style.transform = `scale(1.1)`;
+                    li.style.fontWeight = '600';
+                    li.style.color = 'var(--accent-primary)';
+                } else {
+                    const scale = Math.max(0.8, 1 - (diff / pickerHeight) * 0.4);
+                    const opacity = Math.max(0.2, 1 - (diff / pickerHeight) * 1.5);
+                    li.style.opacity = opacity;
+                    li.style.transform = `scale(${scale})`;
+                    li.style.fontWeight = '400';
+                    li.style.color = 'var(--text-primary)';
+                }
+             });
+        }
+
+        function setupWheelInteraction(ul, onSnapCallback = null) {
+            if(!ul) { console.error("Cannot setup interaction: Wheel UL not found!"); return; }
+            let startY = 0, currentY = 0, startTransformY = 0, isDragging = false;
+            const getTransformY = (el) => {
+                const style = window.getComputedStyle(el).transform;
+                return style === 'none' ? 0 : new DOMMatrixReadOnly(style).m42;
+            };
+            const PADDING = 3;
+
+            const snap = () => {
+                const currentTransformY = getTransformY(ul);
+                const itemsCount = ul.children.length;
+                let index = Math.round((baseOffset - currentTransformY) / itemHeight);
+                index = Math.max(PADDING, Math.min(itemsCount - PADDING - 1, index));
+
+                const finalY = baseOffset - (index * itemHeight);
+                ul.style.transition = 'transform 0.25s ease-out';
+                ul.style.transform = `translateY(${finalY}px) translateZ(0)`;
+                updateItemStyles(ul, finalY);
+                if(onSnapCallback) onSnapCallback();
+            };
+
+            const onStart = (y) => { isDragging = true; startY = y; startTransformY = getTransformY(ul); ul.style.transition = 'none'; };
+            const onMove = (y) => {
+                if (!isDragging) return;
+                const deltaY = y - startY;
+                currentY = startTransformY + deltaY;
+                ul.style.transform = `translateY(${currentY}px) translateZ(0)`;
+                updateItemStyles(ul, currentY);
+            };
+            const onEnd = () => { if (!isDragging) return; isDragging = false; snap(); };
+
+            ['mousedown', 'touchstart'].forEach(evt => ul.addEventListener(evt, (e) => { e.preventDefault(); const y = evt === 'touchstart' ? e.touches[0].clientY : e.clientY; onStart(y); }, { passive: false }));
+            ['mousemove', 'touchmove'].forEach(evt => window.addEventListener(evt, (e) => { if (!isDragging) return; e.preventDefault(); const y = evt === 'touchmove' ? e.touches[0].clientY : e.clientY; onMove(y); }, { passive: false }));
+            ['mouseup', 'touchend', 'touchcancel'].forEach(evt => window.addEventListener(evt, onEnd));
+            ul.addEventListener('wheel', (e) => { e.preventDefault(); const currentTransformY = getTransformY(ul); const newY = currentTransformY - (e.deltaY * 0.5); ul.style.transition = 'none'; ul.style.transform = `translateY(${newY}px) translateZ(0)`; updateItemStyles(ul, newY); clearTimeout(ul.wheelTimeout); ul.wheelTimeout = setTimeout(snap, 150); });
+        }
+
+        function showIOSPicker(inputElement, forceType = null) {
+            currentPickerInput = inputElement;
+            const type = forceType || inputElement.dataset.type;
+            const wheelsContainer = document.querySelector('.ios-picker-wheels');
+            const allCols = wheelsContainer.querySelectorAll('.ios-picker-col');
+
+            allCols.forEach(col => { col.style.display = 'none'; col.classList.remove('single'); });
+
+            let initialValue = null;
+            let colsToShow = [];
+            let isSingle = false;
+
+            pickerCancelBtn.textContent = "Cancelar";
+
+            switch (type) {
+                case 'datetime':
+                    pickerTitle.textContent = pickerState === 'pickingStart' ? 'Selecione Início' : 'Selecione Fim';
+                    if (pickerState === 'pickingEnd') pickerCancelBtn.textContent = "Pular";
+                    colsToShow = ['Day', 'Month', 'Year', 'Hour', 'Minute'];
+                    const iso = inputElement.dataset.isoValue;
+                    initialValue = iso ? new Date(iso) : new Date();
+                    break;
+                case 'interval':
+                    pickerTitle.textContent = 'Selecione o Intervalo';
+                    colsToShow = ['Hour', 'Minute'];
+                    const currentVal = inputElement.value;
+                    let h = 8, m = 0; // Default
+                    if (currentVal) {
+                         const hMatch = currentVal.match(/(\d+)\s*h/);
+                         const mMatch = currentVal.match(/(\d+)\s*min/);
+                         h = hMatch ? parseInt(hMatch[1]) : 0;
+                         m = mMatch ? parseInt(mMatch[1]) : 0;
+                    }
+                    initialValue = { hour: h, minute: m };
+                    break;
+                case 'duration':
+                    pickerTitle.textContent = 'Duração Abertura (s)';
+                    colsToShow = ['Duration'];
+                    initialValue = parseInt(inputElement.value) || 3;
+                    isSingle = true;
+                    break;
+            }
+
+            colsToShow.forEach(key => {
+                const colEl = document.getElementById(`pickerCol${key}`);
+                if(colEl) {
+                    colEl.style.display = 'flex';
+                    if (isSingle) colEl.classList.add('single');
+                } else { console.error(`Picker column 'pickerCol${key}' not found.`); }
+            });
+
+            updateWheelsUI(initialValue, type);
+            pickerBox.classList.add('show');
+        }
+
+        function cancelIOSPicker() {
+            if (pickerState === 'pickingEnd') { }
+            pickerState = null;
+            pickerBox.classList.remove('show');
+            currentPickerInput = null;
+        }
+
+        function startPickingRoutine() {
+            if (pickerBox.classList.contains('show') && pickerState === 'pickingStart') {
+                cancelIOSPicker();
+            } else {
+                pickerState = 'pickingStart';
+                showIOSPicker(document.getElementById('routineStartTime'), 'datetime');
+            }
+        }
+
+        function getSelectedValueFromWheel(ul) {
+             if(!ul) return null;
+             const currentTransformY = new DOMMatrixReadOnly(window.getComputedStyle(ul).transform).m42;
+             const items = ul.children;
+             const PADDING = 3;
+             let index = Math.round((baseOffset - currentTransformY) / itemHeight);
+             index = Math.max(PADDING, Math.min(items.length - (PADDING + 1), index));
+             return items[index] ? parseInt(items[index].dataset.value) : null;
+        }
+
+        function setIOSPickerValue() {
+            if (!currentPickerInput) return;
+            const type = currentPickerInput.dataset.type || (pickerState ? 'datetime' : null);
+
+            if (type === 'datetime') {
+                const day = getSelectedValueFromWheel(wheelCols.Day);
+                const month = getSelectedValueFromWheel(wheelCols.Month);
+                const year = getSelectedValueFromWheel(wheelCols.Year);
+                const hour = getSelectedValueFromWheel(wheelCols.Hour);
+                const minute = getSelectedValueFromWheel(wheelCols.Minute);
+
+                if (day === null || month === null || year === null || hour === null || minute === null) { showNotification("❌ Erro", "Data inválida."); return; }
+                const maxDays = getDaysInMonth(year, month);
+                const validDay = Math.min(day, maxDays);
+                const selectedDate = new Date(year, month, validDay, hour, minute);
+
+                if (pickerState === 'pickingStart') {
+                    document.getElementById('routineStartTime').dataset.isoValue = selectedDate.toISOString();
+                    pickerState = 'pickingEnd';
+                    pickerBox.classList.remove('show');
+                    setTimeout(() => {
+                         showIOSPicker(document.getElementById('routineEndTime'), 'datetime');
+                    }, 350);
+                } else if (pickerState === 'pickingEnd') {
+                    const startTime = new Date(document.getElementById('routineStartTime').dataset.isoValue).getTime();
+                    if (selectedDate.getTime() <= startTime) { showNotification('⚠️ Erro', 'Fim deve ser após Início.'); return; }
+                    document.getElementById('routineEndTime').dataset.isoValue = selectedDate.toISOString();
+                    pickerState = null;
+                    cancelIOSPicker();
+                } else { cancelIOSPicker(); }
+            } else if (type === 'interval') {
+                const hour = getSelectedValueFromWheel(wheelCols.Hour);
+                const minute = getSelectedValueFromWheel(wheelCols.Minute);
+                if (hour === null || minute === null) { showNotification("❌ Erro", "Intervalo inválido."); return; }
+                currentPickerInput.value = `${hour} h ${minute} min`;
+                cancelIOSPicker();
+            } else if (type === 'duration') {
+                const value = getSelectedValueFromWheel(wheelCols.Duration);
+                if (value === null) { showNotification("❌ Erro", "Duração inválida."); return; }
+                currentPickerInput.value = `${value} s`;
+                cancelIOSPicker();
+            } else {
+                 cancelIOSPicker();
+            }
+        }
+
+        document.querySelectorAll('.ios-picker-trigger').forEach(input => input.addEventListener('click', (e) => {
+             if (pickerBox.classList.contains('show') && currentPickerInput === e.target) {
+                cancelIOSPicker();
+             } else {
+                pickerState = null;
+                showIOSPicker(e.target);
+             }
+        }));
+
+        Object.values(wheelCols).forEach(ul => {
+            if(ul) {
+                setupWheelInteraction(ul, (ul === wheelCols.Month || ul === wheelCols.Year) ? updateDayWheel : null);
+            }
+        });
+
+        function formatDateTimeDisplay(isoString) {
+            if (!isoString) return '--';
+            try {
+                const date = new Date(isoString);
+                 return date.toLocaleString('pt-BR', {
+                    day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                }).replace(',', '').replace(' de ', ' ').replace('.', '');
+            } catch (e) { return '--'; }
+        }
+
+        function saveRoutine() {
+            const startTimeValue = document.getElementById('routineStartTime').dataset.isoValue;
+            const endTimeValue = document.getElementById('routineEndTime').dataset.isoValue;
+            const intervalValue = document.getElementById('routineInterval').value;
+            const openDuration = parseInt(document.getElementById('routineOpenDuration').value) || 3;
+            const ignoreSensor = document.getElementById('routineIgnoreSensor').checked;
+            const now = Date.now();
+
+            let hours = 0, minutes = 0;
+            if (intervalValue) {
+                const hMatch = intervalValue.match(/(\d+)\s*h/);
+                const mMatch = intervalValue.match(/(\d+)\s*min/);
+                hours = hMatch ? parseInt(hMatch[1]) : 0;
+                minutes = mMatch ? parseInt(mMatch[1]) : 0;
+            }
+
+            if (!startTimeValue) { showNotification('⚠️ Erro', 'Início é obrigatório.'); return; }
+            const startTime = new Date(startTimeValue).getTime();
+            const endTime = endTimeValue ? new Date(endTimeValue).getTime() : null;
+
+            if (isNaN(startTime)) { showNotification('⚠️ Erro', 'Início inválido.'); return; }
+            if (endTimeValue && isNaN(endTime)) { showNotification('⚠️ Erro', 'Fim inválido.'); return; }
+            if (endTime && endTime <= startTime) { showNotification('⚠️ Erro', 'Fim deve ser após Início.'); return; }
+            if ((hours === 0 && minutes === 0) || (hours < 0 || minutes < 0 || minutes > 59 || hours > 23 )) { showNotification('⚠️ Erro', 'Intervalo inválido.'); return; }
+            if (openDuration < 1 || openDuration > 10) { showNotification('⚠️ Erro', 'Duração inválida (1-10s).'); return; }
+            const intervalMs = (hours * 3600 + minutes * 60) * 1000;
+            if (intervalMs <= 0) { showNotification('⚠️ Erro', 'Intervalo deve ser > 0.'); return; }
+
+            let nextFeedTimestamp = startTime;
+            if (nextFeedTimestamp < now) {
+                while (nextFeedTimestamp < now) { nextFeedTimestamp += intervalMs; }
+            }
+
+            activeRoutine = {
+                startTime: startTimeValue, endTime: endTimeValue,
+                intervalHours: hours, intervalMinutes: minutes, intervalMs: intervalMs,
+                openDuration: openDuration, ignoreSensor: ignoreSensor,
+                nextFeedTimestamp: nextFeedTimestamp, isEnabled: true
+            };
+            localStorage.setItem('petFeederRoutine', JSON.stringify(activeRoutine));
+            updateActiveRoutineDisplay(); startRoutineCountdown();
+            cancelIOSPicker();
+            showNotification('🔄 Rotina Salva!', 'Rotina ativada.');
+        }
+
+        function deactivateRoutine() {
+            showCustomConfirm("Desativar a rotina?", () => {
+                activeRoutine = null; localStorage.removeItem('petFeederRoutine');
+                if (routineCountdownInterval) clearInterval(routineCountdownInterval);
+                document.getElementById('routineStartTime').dataset.isoValue = '';
+                document.getElementById('routineEndTime').dataset.isoValue = '';
+                document.getElementById('routineInterval').value = '';
+                document.getElementById('routineOpenDuration').value = '3 s';
+                document.getElementById('routineIgnoreSensor').checked = false;
+                updateActiveRoutineDisplay();
+                cancelIOSPicker();
+                showNotification('🗑️ Rotina Desativada.');
+            });
+        }
+
+        function loadRoutine() {
+            const storedRoutine = localStorage.getItem('petFeederRoutine');
+            if (storedRoutine) {
+                activeRoutine = JSON.parse(storedRoutine);
+                if (activeRoutine.isEnabled) {
+                    document.getElementById('routineStartTime').dataset.isoValue = activeRoutine.startTime || '';
+                    document.getElementById('routineEndTime').dataset.isoValue = activeRoutine.endTime || '';
+                    document.getElementById('routineInterval').value = `${activeRoutine.intervalHours || 0} h ${activeRoutine.intervalMinutes || 0} min`;
+                    document.getElementById('routineOpenDuration').value = `${activeRoutine.openDuration || 3} s`;
+                    document.getElementById('routineIgnoreSensor').checked = activeRoutine.ignoreSensor || false;
+
+                    const now = Date.now();
+                    const startTime = new Date(activeRoutine.startTime).getTime();
+                    const endTime = activeRoutine.endTime ? new Date(activeRoutine.endTime).getTime() : null;
+
+                    if (endTime && now > endTime) { showNotification('ℹ️ Rotina Concluída.', 'O período terminou.'); deactivateRoutine(); return; }
+                    let nextFeed = activeRoutine.nextFeedTimestamp;
+                    if (nextFeed < now) {
+                        nextFeed = Math.max(now, startTime);
+                        while (nextFeed < now) { nextFeed += activeRoutine.intervalMs; }
+                         if (startTime > now) {
+                            nextFeed = startTime;
+                             while (nextFeed < startTime) { nextFeed += activeRoutine.intervalMs; }
+                        }
+                    }
+                    if (endTime && nextFeed > endTime) { showNotification('ℹ️ Rotina Concluída.', 'Não há mais feeds.'); deactivateRoutine(); return; }
+                    activeRoutine.nextFeedTimestamp = nextFeed;
+                    localStorage.setItem('petFeederRoutine', JSON.stringify(activeRoutine));
+                    updateActiveRoutineDisplay(); startRoutineCountdown();
+                } else { activeRoutine = null; updateActiveRoutineDisplay(); }
+            } else { activeRoutine = null; updateActiveRoutineDisplay(); }
+        }
+
+        function updateActiveRoutineDisplay() {
+            const els = { card: document.getElementById('activeRoutineCard'), start: document.getElementById('routineActiveStart'), end: document.getElementById('routineActiveEnd'), next: document.getElementById('routineNextFeed'), int: document.getElementById('routineActiveInterval'), dur: document.getElementById('routineActiveDuration'), sens: document.getElementById('routineActiveSensor') };
+            if (activeRoutine && activeRoutine.isEnabled) {
+                els.card.style.display = 'block';
+                els.start.textContent = formatDateTimeDisplay(activeRoutine.startTime);
+                els.end.textContent = formatDateTimeDisplay(activeRoutine.endTime) || 'Sem Fim';
+                let intervalText = `${activeRoutine.intervalHours || 0}h ${activeRoutine.intervalMinutes || 0}min`;
+                els.int.textContent = intervalText.trim();
+                els.dur.textContent = `${activeRoutine.openDuration} s`;
+                els.sens.textContent = activeRoutine.ignoreSensor ? 'Desativado' : 'Ativado';
+            } else {
+                els.card.style.display = 'none';
+                if(els.next) els.next.textContent = '--:--:--';
+                if (routineCountdownInterval) clearInterval(routineCountdownInterval);
+            }
+        }
+
+         function startRoutineCountdown() {
+            if (routineCountdownInterval) clearInterval(routineCountdownInterval);
+            if (!activeRoutine || !activeRoutine.isEnabled) return;
+            const nextFeedEl = document.getElementById('routineNextFeed');
+
+            function updateCountdown() {
+                if (!activeRoutine || !activeRoutine.isEnabled) { clearInterval(routineCountdownInterval); updateActiveRoutineDisplay(); return; }
+                const now = Date.now();
+                const startTime = new Date(activeRoutine.startTime).getTime();
+                const endTime = activeRoutine.endTime ? new Date(activeRoutine.endTime).getTime() : null;
+
+                if (endTime && now >= endTime) { showNotification('🏁 Rotina Finalizada.', 'O período terminou.'); deactivateRoutine(); return; }
+                if (now < startTime) {
+                    const timeLeftMs = startTime - now;
+                    const d = Math.floor(timeLeftMs / 86400000); const h = Math.floor((timeLeftMs % 86400000) / 3600000); const m = Math.floor((timeLeftMs % 3600000) / 60000); const s = Math.floor((timeLeftMs % 60000) / 1000);
+                    if(nextFeedEl) nextFeedEl.textContent = `Inicia em ${d > 0 ? d+'d ' : ''}${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+                    if(nextFeedEl) nextFeedEl.classList.add('paused'); return;
+                }
+
+                const timeLeftMs = activeRoutine.nextFeedTimestamp - now;
+                if (timeLeftMs <= 0) {
+                     if (endTime && activeRoutine.nextFeedTimestamp >= endTime) { showNotification('🏁 Rotina Finalizada.', 'Próximo feed seria após o fim.'); deactivateRoutine(); return; }
+                    if(nextFeedEl) nextFeedEl.textContent = 'Alimentando...'; if(nextFeedEl) nextFeedEl.classList.remove('paused');
+                    showNotification('🐾 Hora da Rotina!', 'Acionando...');
+                    sendFirebaseCommand('/comando/abrir', true).then(() => logFeedingEvent('Rotina'));
+                    activeRoutine.nextFeedTimestamp += activeRoutine.intervalMs;
+                    if (endTime && activeRoutine.nextFeedTimestamp > endTime) {
+                         showNotification('🏁 Rotina Finalizada.', 'Último feed concluído.');
+                         setTimeout(deactivateRoutine, 2000);
+                    } else {
+                         localStorage.setItem('petFeederRoutine', JSON.stringify(activeRoutine));
+                    }
+                    return;
+                }
+                if(nextFeedEl) nextFeedEl.classList.remove('paused');
+                const h = Math.floor(timeLeftMs / 3600000); const m = Math.floor((timeLeftMs % 3600000) / 60000); const s = Math.floor((timeLeftMs % 60000) / 1000);
+                if(nextFeedEl) nextFeedEl.textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+            }
+            updateCountdown(); routineCountdownInterval = setInterval(updateCountdown, 1000);
+        }
+
+        function updateDashboardQuickAccess() {
+            const leftContainer = document.getElementById('quickAccessLeftContainer');
+            const rightContainer = document.getElementById('quickAccessRightContainer');
+            populateQuickAccessCard(leftContainer, quickAccessLeft);
+            populateQuickAccessCard(rightContainer, quickAccessRight);
+        }
+
+        function populateQuickAccessCard(container, screenKey) {
+            if (!container) return;
+            container.innerHTML = '';
+            if (screenKey === 'none' || !screenKey) {
+                container.style.display = 'none';
+                return;
+            }
+
+            container.style.display = 'flex';
+            let title = '', description = '', icon = '';
+
+            switch (screenKey) {
+                case 'monitorScreen':
+                    title = 'Monitor Rápido'; icon = '📊';
+                    description = `Status: <span class="value ${isOnline ? 'status-online' : 'status-offline'}">${isOnline ? 'Online' : 'Offline'}</span><br>
+                                 Distância: <span class="value">${firebaseData.estado?.distancia_cm?.toFixed(1) || '---'} cm</span><br>
+                                 Porta: <span class="value">${firebaseData.estado?.evento?.toLowerCase().includes('abert') ? 'Aberta' : 'Fechada'}</span>`;
+                    break;
+                case 'reportsScreen':
+                    title = 'Resumo Relatório'; icon = '📈';
+                    const history = JSON.parse(localStorage.getItem('feedingHistory')) || [];
+                    description = `Total: <span class="value">${history.length}</span><br>
+                                 Hoje: <span class="value">${firebaseData.metricas?.refeicoes_hoje || '0'}</span><br>
+                                 Última: <span class="value">${firebaseData.metricas?.ultima_refeicao_timestamp ? new Date(firebaseData.metricas.ultima_refeicao_timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '---'}</span>`;
+                    break;
+                case 'routinesScreen':
+                    title = 'Status Rotina'; icon = '⏰';
+                    if (activeRoutine && activeRoutine.isEnabled) {
+                         const now = Date.now();
+                         const startTime = new Date(activeRoutine.startTime).getTime();
+                         let nextText = '--:--:--';
+                         if (now < startTime) { nextText = 'Aguardando Início'; }
+                         else { const timeLeftMs = activeRoutine.nextFeedTimestamp - now;
+                             if(timeLeftMs <= 0) { nextText = 'Alimentando...'; }
+                             else { const h = Math.floor(timeLeftMs / 3600000); const m = Math.floor((timeLeftMs % 3600000) / 60000); nextText = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`; }
+                         }
+                        description = `Status: <span class="value status-online">Ativa</span><br>
+                                     Próxima: <span class="value">${nextText}</span><br>
+                                     Intervalo: <span class="value">${activeRoutine.intervalHours}h ${activeRoutine.intervalMinutes}m</span>`;
+                    } else {
+                        description = `Status: <span class="value status-offline">Inativa</span>`;
+                    }
+                    break;
+            }
+
+            container.innerHTML = `
+                <h4>${icon} ${title}</h4>
+                <p>${description}</p>
+                <button class="details-btn" onclick="navigateTo('${screenKey}')">Ver Detalhes</button>
+            `;
+        }
+
+
+        async function listAvailableModels() {
+           showNotification("⏳","Listando modelos IA...");
+           setTimeout(() => {
+                showNotification("ℹ️ Info", "Recurso de listagem de modelos ainda em desenvolvimento.");
+           }, 1500);
+        }
+
+        async function suggestIdealRoutineWithGemini() {
+           const resultDiv = document.getElementById('routineSuggestionResult');
+           const applyBtn = document.getElementById('applyRecommendedRoutineBtn');
+           resultDiv.innerHTML = '<div class="loading-spinner"></div>';
+           applyBtn.style.display = 'none';
+           document.getElementById('routineSuggestionCard').style.display = 'block';
+
+           setTimeout(() => {
+                const pet = {
+                    type: document.getElementById('healthPetType').value,
+                    weight: document.getElementById('healthPetWeight').value,
+                    age: document.getElementById('healthPetAge').value,
+                    size: document.getElementById('healthPetSize').value,
+                };
+                if (!pet.weight || !pet.age) {
+                     resultDiv.innerHTML = '❌ Por favor, preencha Peso e Idade.';
+                     return;
+                }
+
+                let suggestion = `🐾 **Sugestão para ${pet.type} (${pet.size})**:\n`;
+                suggestion += `- **Intervalo:** 8 horas (3x ao dia)\n`;
+                suggestion += `- **Duração Abertura:** 4 segundos\n`;
+                suggestion += `\n*Lembre-se: Esta é uma sugestão geral. Consulte um veterinário para recomendações específicas.*`;
+
+                resultDiv.innerHTML = suggestion.replace(/\n/g, '<br>');
+                applyBtn.style.display = 'block';
+                applyBtn.dataset.hours = 8;
+                applyBtn.dataset.minutes = 0;
+                applyBtn.dataset.duration = 4;
+
+           }, 2000);
+        }
+
+        function applyAIRoutine() {
+            const applyBtn = document.getElementById('applyRecommendedRoutineBtn');
+            const hours = parseInt(applyBtn.dataset.hours) || 8;
+            const minutes = parseInt(applyBtn.dataset.minutes) || 0;
+            const duration = parseInt(applyBtn.dataset.duration) || 4;
+
+            document.getElementById('routineInterval').value = `${hours} h ${minutes} min`;
+            document.getElementById('routineOpenDuration').value = `${duration} s`;
+            document.getElementById('routineStartTime').dataset.isoValue = '';
+            document.getElementById('routineEndTime').dataset.isoValue = '';
+
+            showNotification('✅ Aplicado!', 'Ajuste os horários e salve.');
+            document.getElementById('createRoutineCard').scrollIntoView({ behavior: 'smooth' });
+            cancelIOSPicker();
+        }
+
+        function openAboutPage() {
+            const aboutUrl = 'https://htmlpreview.github.io/?https://github.com/JoaoPNobrega/PetFeeder-Front/blob/main/Embarcados2/data/index_sobre.html';
+            window.open(aboutUrl, '_blank');
+        }
+
+        window.onload = () => {
+             applyTheme(currentTheme);
+             populatePetSelectors();
+             updatePetInfo();
+             renderReports();
+             loadRoutine();
+             updateDashboardQuickAccess();
+             if (petName && petEmoji) { navigateTo('dashboard'); }
+             else { navigateTo('welcomeScreen'); }
+             if (firebaseDb) {
+                 startFirebaseListeners();
+             } else {
+                 isOnline = false;
+                 updateUI();
+                 showNotification("⚠️ Firebase", "Não conectado. Verifique a config.");
+             }
+        };
+    </script>
+</body>
+</html>
