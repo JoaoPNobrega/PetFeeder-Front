@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PetFeeder</title>
     <style>
-        /* Estilos CSS - (Originais + Modificações v6 + Novas Modificações) */
         :root {
             --bg-primary: #000000;
             --bg-secondary: #1c1c1e;
@@ -85,7 +84,7 @@
             --text-primary: #ffffff;
             --text-secondary: #b0b0b0;
             --border-color: #38383a;
-            --accent-primary: #ffffff; /* This is white for gradient */
+            --accent-primary: #ffffff;
             --accent-secondary: #f0f0f0;
             --slider-thumb: #ffffff;
             --nav-bg: rgba(10, 10, 10, 0.7);
@@ -487,7 +486,7 @@
             .settings-screen .screen-content .save-all-btn-container {
                 flex-basis: 100%;
                 text-align: center;
-                margin-top: 20px; /* Original space before save button */
+                margin-top: 20px;
             }
              .settings-screen .screen-content .save-all-btn-container .feed-btn {
                 max-width: 400px;
@@ -497,7 +496,7 @@
              }
             .settings-screen .screen-content .about-btn-container {
                 flex-basis: 100%;
-                margin-top: 10px; /* Reduced distance for desktop after save button */
+                margin-top: 10px;
             }
         }
 
@@ -1127,7 +1126,7 @@
                     pickerTitle.textContent = 'Selecione o Intervalo';
                     colsToShow = ['Hour', 'Minute'];
                     const currentVal = inputElement.value;
-                    let h = 8, m = 0; // Default
+                    let h = 8, m = 0;
                     if (currentVal) {
                          const hMatch = currentVal.match(/(\d+)\s*h/);
                          const mMatch = currentVal.match(/(\d+)\s*min/);

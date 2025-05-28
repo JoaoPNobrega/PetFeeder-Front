@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Petfeed — Documentação</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <style>
     :root {
       --bg-primary: #0a0a0a;
@@ -293,34 +293,34 @@
       </div>
 
       <div id="secao-primeiraVersao" class="secao-conteudo">
-        <div class="secao-cinematica invertida" data-id="versaoFinal"> <div class="conteudo-texto">
+        <div class="secao-cinematica invertida" data-id="primeiraVersao"> <div class="conteudo-texto">
             <h2>Protótipo</h2> <p>A ideia inicial era utilizar impressão 3D, mas, por falta de experiência, optei por uma versão caseira em papelão, focada apenas em testar a interação do sistema com o mundo real.</p>
             <p>Apesar da simplicidade, esse protótipo trouxe muito aprendizado. Pude entender melhor como trabalhar com o motor servo e sua função de abrir a porta, além de refletir sobre o que deveria ou não ficar visível no projeto.</p>
             <p>Ao final, decidi expor apenas o potenciômetro e o sensor ultrassônico.</p>
           </div>
           <div class="conteudo-midia">
             <div class="frame-scroll-container">
-              <video id="frame-versaoFinal" class="frame-scroll" src="https://joaopnobrega.github.io/PetFeeder-Front/Embarcados2/data/frames/petfeed.mp4" muted playsinline preload="auto" alt="Protótipo PetFeeder"></video>
+              <video id="frame-primeiraVersao" class="frame-scroll" src="https://joaopnobrega.github.io/PetFeeder-Front/Embarcados2/data/frames/petfeed.mp4" muted playsinline preload="auto" alt="Protótipo PetFeeder"></video>
             </div>
             <div class="slider-vertical-container">
-              <input type="range" class="frame-slider-vertical" id="slider-versaoFinal" min="0" max="1" step="0.01" value="0">
+              <input type="range" class="frame-slider-vertical" id="slider-primeiraVersao" min="0" max="1" step="0.01" value="0">
             </div>
           </div>
         </div>
       </div>
 
       <div id="secao-versaoFinal" class="secao-conteudo">
-        <div class="secao-cinematica" data-id="primeiraVersao"> <div class="conteudo-texto">
+          <div class="secao-cinematica" data-id="versaoFinal"> <div class="conteudo-texto">
             <h2>Versão Final</h2> <p>Esta versão teve como foco corrigir pequenos problemas da estrutura de papelão, como a saída irregular da ração, causada pela forma como havia sido construída, a falta de fixação do potenciômetro e a ausência de proteção adequada para o sensor ultrassônico.</p>
             <p>Para a construção, utilizamos o aplicativo Fusion 360 para modelagem e aplicamos corte a laser nas peças.</p>
             <p>Essa versão recebeu o nome PetFeed AT em referência ao Amostra-Tech, a feira de ciências do CESAR School — evento para o qual ela foi especialmente desenvolvida.</p>
           </div>
           <div class="conteudo-midia">
             <div class="frame-scroll-container">
-              <video id="frame-primeiraVersao" class="frame-scroll" src="https://joaopnobrega.github.io/PetFeeder-Front/Embarcados2/data/frames/at.mp4" muted playsinline preload="auto" alt="PetFeed AT Edition"></video>
+              <video id="frame-versaoFinal" class="frame-scroll" src="https://joaopnobrega.github.io/PetFeeder-Front/Embarcados2/data/frames/petfeederv1.mp4" muted playsinline preload="auto" alt="PetFeed V1"></video>
             </div>
             <div class="slider-vertical-container">
-              <input type="range" class="frame-slider-vertical" id="slider-primeiraVersao" min="0" max="1" step="0.01" value="0">
+              <input type="range" class="frame-slider-vertical" id="slider-versaoFinal" min="0" max="1" step="0.01" value="0">
             </div>
           </div>
         </div>
@@ -648,7 +648,7 @@ async function abrir() {
                     const pStartProgressBase = 0.01, pStaggerFactor = 0.1, pDurationProgress = 0.3; let pStartProgress = (index === 0) ? pStartProgressBase : pStartProgressBase + 0.05 + ((index-1) * pStaggerFactor);
                     let pProgress = Math.min(1, Math.max(0, (progress - pStartProgress) / pDurationProgress));
 
-                    if (index === 0) { // Primeiro parágrafo
+                    if (index === 0) {
                         if (pProgress >= 0.99) {
                             p.style.opacity = 1;
                             p.style.filter = 'none';
@@ -657,7 +657,7 @@ async function abrir() {
                             p.style.filter = `blur(${(1 - pProgress) * 4}px)`;
                         }
                         p.style.transform = 'translateY(0px)';
-                    } else { // Demais parágrafos
+                    } else {
                         if (pProgress >= 0.99) {
                             p.style.opacity = 1;
                             p.style.filter = 'none';
@@ -717,10 +717,8 @@ async function abrir() {
             const videoElement = data.videoId ? document.getElementById(data.videoId) : null;
             const imgElement = data.frameImgId ? document.getElementById(data.frameImgId) : null;
             const sliderElement = data.sliderId ? document.getElementById(data.sliderId) : null;
-            // Correção: A querySelector para as seções principais deve usar o data-id da div .secao-cinematica que está *dentro* da .secao-conteudo (e.g. #secao-prototipo > .secao-cinematica[data-id="prototipo"])
-            // No entanto, a lógica atual de `requirementIdForQuery` já está correta porque os `data-id`s são únicos e identificam a .secao-cinematica correta.
             let querySelector = `.secao-cinematica[data-id="${data.requirementIdForQuery}"]`;
-            if (!data.isMain) { // Para seções de requisitos
+            if (!data.isMain) {
                  querySelector = `.secao-cinematica[data-requirement-id="${data.requirementIdForQuery}"]`;
             }
             let sectionElement = document.querySelector(querySelector);
@@ -739,8 +737,8 @@ async function abrir() {
         const system = vsWrapper.system; const slider = vsWrapper.slider; let currentProgress = parseFloat(slider.value);
         const step = event.deltaY > 0 ? 0.02 : -0.02; let newProgress = currentProgress + step;
         newProgress = Math.max(0, Math.min(1, newProgress));
-        if ((event.deltaY < 0 && currentProgress <= 0) || (event.deltaY > 0 && currentProgress >= 1)) return; // Permite scroll normal nos limites
-        event.preventDefault(); // Previne scroll da página enquanto a animação interna ocorre
+        if ((event.deltaY < 0 && currentProgress <= 0) || (event.deltaY > 0 && currentProgress >= 1)) return;
+        event.preventDefault();
         system.updateProgress(newProgress);
      }
      function handleRequisitosPageScroll() {
@@ -811,7 +809,7 @@ async function abrir() {
         }
      }
      function createPinnableObserver() {
-        const observerOptions = { root: null, rootMargin: '0px', threshold: 0.9 }; // Pin when 90% visible
+        const observerOptions = { root: null, rootMargin: '0px', threshold: 0.9 };
         pinnableObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 const targetElement = entry.target;
@@ -819,7 +817,7 @@ async function abrir() {
                     if (activePinnableSection !== targetElement) {
                         if (activePinnableSection) { activePinnableSection.removeEventListener('wheel', handlePinnableWheel); activePinnableSection.classList.remove('is-pinned'); }
                         activePinnableSection = targetElement; const vsWrapper = videoScrollSystems.find(f => f.sectionElement === targetElement);
-                        if(vsWrapper && !vsWrapper.isStatic && vsWrapper.slider) { // Adicionado vsWrapper.slider para segurança
+                        if(vsWrapper && !vsWrapper.isStatic && vsWrapper.slider) {
                              targetElement.addEventListener('wheel', handlePinnableWheel, { passive: false });
                         }
                         targetElement.classList.add('is-pinned');
@@ -841,7 +839,7 @@ async function abrir() {
         const botaoSelecionado = document.querySelector(`.btn-secao[data-secao="${secaoId}"]`); if (botaoSelecionado) botaoSelecionado.classList.add('ativo');
 
         deactivatePinnableSections(); deactivateRequisitosObservers();
-        requisitosScrollListenerActive = false; finalSectionActive = false; // Reset flags
+        requisitosScrollListenerActive = false; finalSectionActive = false;
 
         if (secaoId === 'prototipo' || secaoId === 'versaoFinal' || secaoId === 'primeiraVersao') {
             activatePinnableSections();
@@ -850,23 +848,21 @@ async function abrir() {
             requisitosScrollListenerActive = true;
         }
 
-        // Reset and update current video system
         videoScrollSystems.forEach(vs => {
             const isCurrentSystemActive = vs.sectionElement && vs.sectionElement.closest('.secao-conteudo.ativa');
             if (isCurrentSystemActive && vs.system) {
-                vs.system.setInitialTextState(); // Garante que o texto comece no estado inicial
-                if (!vs.isStatic && vs.system.isReady && vs.slider) { // Adicionado vs.slider
-                    vs.system.updateProgress(0); // Reseta o progresso do vídeo para 0
-                    vs.slider.value = 0; // Reseta o valor do slider
+                vs.system.setInitialTextState();
+                if (!vs.isStatic && vs.system.isReady && vs.slider) {
+                    vs.system.updateProgress(0);
+                    vs.slider.value = 0;
                 }
             }
         });
-        setTimeout(handleScroll, 100); // Update scrollbar
+        setTimeout(handleScroll, 100);
      }
 
-     // --- EVENT LISTENERS ---
      document.addEventListener('DOMContentLoaded', function() {
-        initVideoScrollSystems(); // Inicializa os sistemas de vídeo primeiro
+        initVideoScrollSystems();
         createPinnableObserver();
 
         finalVideoElement.addEventListener('loadedmetadata', () => {
@@ -893,7 +889,6 @@ async function abrir() {
         finalTextOverlay.style.opacity = 0;
      });
 
-     // --- CÓDIGOS FINAIS ---
      if ('serviceWorker' in navigator) navigator.serviceWorker.register('data:text/javascript,').catch(() => {});
      const style = document.createElement('style');
      style.textContent = `@keyframes rainbow { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } } @keyframes glow { 0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 136, 0.3); } 50% { box-shadow: 0 0 40px rgba(0, 255, 136, 0.8); } }`;

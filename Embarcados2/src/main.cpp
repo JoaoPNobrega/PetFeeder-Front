@@ -124,7 +124,7 @@ const char SIMPLE_HTML_PAGE[] PROGMEM = R"rawliteral(
             --accent-primary: #ffffff;
             --status-green: #34c759;
             --status-red: #ff3b30;
-            --status-orange: #ff9500; /* Added for Reset */
+            --status-orange: #ff9500;
             --status-purple: #5856d6;
             --button-bg: rgba(255, 255, 255, 0.25);
             --button-border: rgba(255, 255, 255, 0.3);
@@ -136,10 +136,9 @@ const char SIMPLE_HTML_PAGE[] PROGMEM = R"rawliteral(
         .screen { display: none; flex-direction: column; align-items: center; padding: 30px 20px 95px 20px; /* Increased bottom padding */ min-height: 100vh; animation: fadeIn 0.5s forwards; }
         .screen.active { display: flex; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .screen-content { width: 100%; max-width: 380px; display: none; /* Hide sections by default */ }
-        .screen-content.active { display: block; } /* Show active section */
+        .screen-content { width: 100%; max-width: 380px; display: none;}
+        .screen-content.active { display: block; } 
 
-        /* Welcome Screen */
         .welcome-screen { justify-content: center; text-align: center; }
         .app-icon { font-size: 80px; margin-bottom: 20px; }
         .welcome-title { font-size: 32px; font-weight: 700; margin-bottom: 10px; }
@@ -283,7 +282,7 @@ const char SIMPLE_HTML_PAGE[] PROGMEM = R"rawliteral(
 
         const welcomeScreen = document.getElementById('welcomeScreen');
         const mainScreen = document.getElementById('mainScreen');
-        const navBar = document.getElementById('navBar'); // Get navBar element
+        const navBar = document.getElementById('navBar');
         const petNameInput = document.getElementById('petNameInput');
         const continueBtn = document.getElementById('continueBtn');
         const petOptions = document.querySelectorAll('.pet-option');
@@ -302,7 +301,7 @@ const char SIMPLE_HTML_PAGE[] PROGMEM = R"rawliteral(
 
             document.getElementById(sectionId).classList.add('active');
             document.getElementById('nav' + sectionId.replace('Section', '')).classList.add('active');
-            updateHeaders(); // Update headers when changing section
+            updateHeaders();
         }
 
         function updateHeaders() {
@@ -334,7 +333,7 @@ const char SIMPLE_HTML_PAGE[] PROGMEM = R"rawliteral(
         function showWelcomeScreen() {
             welcomeScreen.classList.add('active');
             mainScreen.classList.remove('active');
-            navBar.style.display = 'none'; // Hide nav bar
+            navBar.style.display = 'none';
             document.querySelector('.pet-option[data-pet="🐕"]').classList.add('selected');
             petEmoji = '🐕';
             checkSetupComplete();
@@ -344,9 +343,8 @@ const char SIMPLE_HTML_PAGE[] PROGMEM = R"rawliteral(
             updateHeaders();
             welcomeScreen.classList.remove('active');
             mainScreen.classList.add('active');
-            navBar.style.display = 'flex'; // Show nav bar
-            showSection('controlSection'); // Show control by default
-            fetchStatus();
+            navBar.style.display = 'flex';
+            showSection('controlSection');
             setInterval(fetchStatus, 5000);
             loadRoutine();
         }
@@ -412,7 +410,7 @@ const char SIMPLE_HTML_PAGE[] PROGMEM = R"rawliteral(
                 openTime: openTime,
                 nextFeedTime: startTimestamp
             };
-
+            
             const now = Date.now();
             while (routineData.nextFeedTime < now && routineData.nextFeedTime < (routineData.endTime || Infinity)) {
                  routineData.nextFeedTime += routineData.intervalMs;
@@ -480,14 +478,13 @@ const char SIMPLE_HTML_PAGE[] PROGMEM = R"rawliteral(
                 while (routineData.nextFeedTime < now) {
                     routineData.nextFeedTime += routineData.intervalMs;
                 }
-
+                
                 if (routineData.endTime && routineData.nextFeedTime > routineData.endTime) {
                     routineStatusDiv.innerText = "Status Rotina: Período encerrado.";
                     cancelRoutine();
                     return;
                 }
 
-                // Check if it's within the minute (adjusting for potential JS delays)
                 if (now >= routineData.nextFeedTime && now < (routineData.nextFeedTime + 30000)) { 
                     routineFeed(routineData.openTime);
                     routineData.nextFeedTime += routineData.intervalMs; 
@@ -499,17 +496,16 @@ const char SIMPLE_HTML_PAGE[] PROGMEM = R"rawliteral(
             };
 
             check(); 
-            routineIntervalId = setInterval(check, 30000); // Check every 30 seconds
+            routineIntervalId = setInterval(check, 30000);
         }
 
         function resetApp() {
             if (confirm("Tem certeza que deseja reiniciar o app? Todos os dados locais (nome e rotina) serão perdidos.")) {
                 localStorage.clear();
-                location.reload(); // Reload the page to go back to initial state
+                location.reload();
             }
         }
 
-        // Startup
         window.onload = () => {
             const storedName = localStorage.getItem('petName');
             const storedEmoji = localStorage.getItem('petEmoji');
