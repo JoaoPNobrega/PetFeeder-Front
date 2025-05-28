@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PetFeeder Local</title>
+    <style>
+        :root {
+            --bg-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --bg-secondary: rgba(28, 28, 30, 0.6);
+            --bg-tertiary: rgba(44, 44, 46, 0.7);
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --border-color: rgba(56, 56, 58, 0.5);
+            --accent-primary: #ffffff;
+            --status-green: #34c759;
+            --status-red: #ff3b30;
+            --status-orange: #ff9500; /* Added for Reset */
+            --status-purple: #5856d6;
+            --button-bg: rgba(255, 255, 255, 0.25);
+            --button-border: rgba(255, 255, 255, 0.3);
+            --button-hover: rgba(255, 255, 255, 0.35);
+            --input-bg: rgba(44, 44, 46, 0.8);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-primary); min-height: 100vh; overflow-x: hidden; color: var(--text-primary); }
+        .screen { display: none; flex-direction: column; align-items: center; padding: 30px 20px 95px 20px; /* Increased bottom padding */ min-height: 100vh; animation: fadeIn 0.5s forwards; }
+        .screen.active { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .screen-content { width: 100%; max-width: 380px; display: none; /* Hide sections by default */ }
+        .screen-content.active { display: block; } /* Show active section */
+
+        /* Welcome Screen */
+        .welcome-screen { justify-content: center; text-align: center; }
+        .app-icon { font-size: 80px; margin-bottom: 20px; }
+        .welcome-title { font-size: 32px; font-weight: 700; margin-bottom: 10px; }
+        .welcome-subtitle { font-size: 18px; opacity: 0.8; margin-bottom: 40px; }
+        .input-group { margin-bottom: 20px; text-align: left; }
+        .input-label { font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; padding-left: 5px; display: block; }
+        .pet-input, .datetime-input { width: 100%; padding: 16px; border: 1px solid var(--button-border); border-radius: 12px; background: var(--input-bg); color: var(--text-primary); font-size: 17px; backdrop-filter: blur(10px); }
+        .datetime-input { padding: 12px; font-size: 15px; margin-bottom: 10px; color-scheme: dark; } /* Estilo para datetime */
+        .pet-selector { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 30px; }
+        .pet-option { background: var(--input-bg); border: 2px solid transparent; border-radius: 16px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.3s ease; backdrop-filter: blur(10px); }
+        .pet-option.selected { border-color: var(--accent-primary); box-shadow: 0 0 8px var(--accent-primary); }
+        .pet-option-emoji { font-size: 36px; margin-bottom: 10px; }
+        .pet-option-name { font-size: 14px; font-weight: 500; }
+        .btn { background: var(--button-bg); backdrop-filter: blur(10px); border: 1px solid var(--button-border); color: white; padding: 16px 40px; border-radius: 25px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; width: 100%; }
+        .btn:hover { background: var(--button-hover); }
+        .btn:disabled { background: rgba(88, 88, 90, 0.5); color: #8e8e93; cursor: not-allowed; }
+
+        /* Main Screen */
+        .card { background: var(--bg-secondary); border-radius: 16px; padding: 20px; margin-bottom: 20px; backdrop-filter: blur(15px); border: 1px solid var(--border-color); }
+        .header { text-align: center; margin-bottom: 30px; }
+        .pet-avatar { font-size: 50px; margin-bottom: 10px; }
+        .pet-name { font-size: 24px; font-weight: 700; }
+        .card h3 { font-size: 18px; font-weight: 600; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); }
+        #status, #routineStatus { margin-top: 15px; font-size: 14px; color: var(--text-secondary); background: var(--bg-tertiary); padding: 10px 15px; border-radius: 8px; text-align: center; min-height: 40px; }
+        .interval-group { display: flex; gap: 10px; align-items: center; }
+        .interval-group input { flex-grow: 1; }
+        .interval-group span { font-size: 14px; }
+        .btn.action { background-color: var(--status-green); border-color: var(--status-green); }
+        .btn.action:hover { background-color: #2ca048; }
+        .btn.routine { background-color: var(--status-purple); border-color: var(--status-purple); margin-top: 10px; }
+        .btn.routine:hover { background-color: #4644a8; }
+        .btn.cancel { background-color: var(--status-red); border-color: var(--status-red); margin-top: 10px; }
+        .btn.cancel:hover { background-color: #c70015; }
+        .btn.reset { background-color: var(--status-orange); border-color: var(--status-orange); margin-top: 10px; } /* Reset Button Style */
+        .btn.reset:hover { background-color: #e68a00; }
+        .settings-p { color: var(--text-secondary); font-size: 13px; text-align: center; margin-top: 10px; line-height: 1.4; }
+
+
+        /* Nav Bar */
+        .nav-bar { position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%); width: auto; background: var(--bg-tertiary); backdrop-filter: blur(20px); border-radius: 28px; display: flex; z-index: 100; box-shadow: 0 4px 14px rgba(0,0,0,0.25); }
+        .nav-item { color: var(--text-secondary); cursor: pointer; padding: 12px 20px; font-size: 24px; transition: color 0.3s ease; }
+        .nav-item.active { color: var(--accent-primary); }
+    </style>
+</head>
+<body>
+
+    <div class="screen welcome-screen active" id="welcomeScreen">
+        <div class="screen-content active"> <div class="app-icon">🍽️</div>
+            <h1 class="welcome-title">PetFeeder</h1>
+            <p class="welcome-subtitle">Controle Local Inteligente</p>
+            <div class="input-group">
+                <label class="input-label">Nome do Pet</label>
+                <input type="text" class="pet-input" id="petNameInput" placeholder="Ex: Buddy, Luna...">
+            </div>
+            <div class="input-group">
+                <label class="input-label">Tipo do Pet</label>
+                <div class="pet-selector">
+                    <div class="pet-option" data-pet="🐕">
+                        <div class="pet-option-emoji">🐕</div>
+                        <div class="pet-option-name">Cachorro</div>
+                    </div>
+                    <div class="pet-option" data-pet="🐱">
+                        <div class="pet-option-emoji">🐱</div>
+                        <div class="pet-option-name">Gato</div>
+                    </div>
+                </div>
+            </div>
+            <button class="btn" id="continueBtn" disabled>Continuar</button>
+        </div>
+    </div>
+
+    <div class="screen" id="mainScreen">
+        <div class="screen-content active" id="controlSection"> <div class="header">
+                <div class="pet-avatar" id="petAvatar"></div>
+                <h2 class="pet-name" id="petNameDisplay"></h2>
+            </div>
+            <div class="card">
+                <h3>Controle Manual</h3>
+                <input type="number" id="manualTime" class="pet-input" placeholder="Tempo em ms (1000-10000)" value="3500" min="1000" max="10000">
+                <button class="btn action" onclick="manualFeed()" style="margin-top: 15px;">🔓 Abrir Porta Agora</button>
+                <div id="status">Status: Conectando...</div>
+            </div>
+        </div>
+
+        <div class="screen-content" id="routineSection">
+             <div class="header">
+                <div class="pet-avatar" id="petAvatarRoutine"></div>
+                <h2 class="pet-name" id="petNameDisplayRoutine"></h2>
+            </div>
+            <div class="card">
+                <h3>Configurar Rotina</h3>
+                <div class="input-group">
+                    <label class="input-label">Início da Rotina</label>
+                    <input type="datetime-local" class="datetime-input" id="startTime">
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Fim da Rotina (Opcional)</label>
+                    <input type="datetime-local" class="datetime-input" id="endTime">
+                </div>
+                 <div class="input-group">
+                    <label class="input-label">Intervalo</label>
+                    <div class="interval-group">
+                       <input type="number" class="pet-input" id="intervalHours" placeholder="Horas" min="0" max="23">
+                       <span>H</span>
+                       <input type="number" class="pet-input" id="intervalMinutes" placeholder="Min" min="0" max="59">
+                       <span>Min</span>
+                    </div>
+                 </div>
+                 <div class="input-group">
+                    <label class="input-label">Tempo Abertura (ms)</label>
+                    <input type="number" id="routineTime" class="pet-input" value="3500" min="1000" max="10000">
+                </div>
+                <button class="btn routine" onclick="saveRoutine()">💾 Salvar e Ativar Rotina</button>
+                <button class="btn cancel" onclick="cancelRoutine()" style="display: none;" id="cancelRoutineBtn">🗑️ Cancelar Rotina</button>
+                <div id="routineStatus">Status Rotina: Inativa</div>
+            </div>
+        </div>
+
+        <div class="screen-content" id="settingsSection"> <div class="header">
+                <div class="pet-avatar" id="petAvatarSettings"></div>
+                <h2 class="pet-name" id="petNameDisplaySettings"></h2>
+            </div>
+            <div class="card">
+                <h3>Configurações Gerais</h3>
+                 <button class="btn reset" onclick="resetApp()">🔄 Reiniciar App</button>
+                 <p class="settings-p">Isso limpará todos os dados salvos (nome do pet e rotina) e voltará para a tela inicial.</p>
+            </div>
+        </div>
+
+        <div class="nav-bar" id="navBar">
+            <div class="nav-item active" id="navControl" onclick="showSection('controlSection')">🕹️</div>
+            <div class="nav-item" id="navRoutine" onclick="showSection('routineSection')">⏰</div>
+            <div class="nav-item" id="navSettings" onclick="showSection('settingsSection')">⚙️</div> </div>
+    </div>
+
+    <script>
+        let petName = '';
+        let petEmoji = '🐕';
+        let routineIntervalId = null;
+        let routineData = {};
+
+        const welcomeScreen = document.getElementById('welcomeScreen');
+        const mainScreen = document.getElementById('mainScreen');
+        const navBar = document.getElementById('navBar'); // Get navBar element
+        const petNameInput = document.getElementById('petNameInput');
+        const continueBtn = document.getElementById('continueBtn');
+        const petOptions = document.querySelectorAll('.pet-option');
+        const statusDiv = document.getElementById('status');
+        const routineStatusDiv = document.getElementById('routineStatus');
+        const cancelRoutineBtn = document.getElementById('cancelRoutineBtn');
+
+        const allSections = document.querySelectorAll('.screen-content');
+        const allNavItems = document.querySelectorAll('.nav-item');
+        const allPetAvatars = document.querySelectorAll('.pet-avatar');
+        const allPetNames = document.querySelectorAll('.pet-name');
+
+        function showSection(sectionId) {
+            allSections.forEach(sec => sec.classList.remove('active'));
+            allNavItems.forEach(item => item.classList.remove('active'));
+
+            document.getElementById(sectionId).classList.add('active');
+            document.getElementById('nav' + sectionId.replace('Section', '')).classList.add('active');
+            updateHeaders(); // Update headers when changing section
+        }
+
+        function updateHeaders() {
+            allPetAvatars.forEach(avatar => avatar.textContent = petEmoji);
+            allPetNames.forEach(name => name.textContent = petName);
+        }
+
+        function checkSetupComplete() {
+            continueBtn.disabled = !(petNameInput.value.trim().length >= 2 && petEmoji);
+        }
+
+        petNameInput.addEventListener('input', checkSetupComplete);
+        petOptions.forEach(opt => {
+            opt.addEventListener('click', () => {
+                petOptions.forEach(o => o.classList.remove('selected'));
+                opt.classList.add('selected');
+                petEmoji = opt.dataset.pet;
+                checkSetupComplete();
+            });
+        });
+
+        continueBtn.addEventListener('click', () => {
+            petName = petNameInput.value.trim();
+            localStorage.setItem('petName', petName);
+            localStorage.setItem('petEmoji', petEmoji);
+            showMainScreen();
+        });
+
+        function showWelcomeScreen() {
+            welcomeScreen.classList.add('active');
+            mainScreen.classList.remove('active');
+            navBar.style.display = 'none'; // Hide nav bar
+            document.querySelector('.pet-option[data-pet="🐕"]').classList.add('selected');
+            petEmoji = '🐕';
+            checkSetupComplete();
+        }
+
+        function showMainScreen() {
+            updateHeaders();
+            welcomeScreen.classList.remove('active');
+            mainScreen.classList.add('active');
+            navBar.style.display = 'flex'; // Show nav bar
+            showSection('controlSection'); // Show control by default
+            fetchStatus();
+            setInterval(fetchStatus, 5000);
+            loadRoutine();
+        }
+
+        async function fetchStatus() {
+            try {
+                const res = await fetch("/status");
+                if (res.ok) {
+                    const txt = await res.text();
+                    statusDiv.innerText = "Status: " + txt;
+                } else {
+                     statusDiv.innerText = "Status: Erro ao conectar.";
+                }
+            } catch (error) {
+                statusDiv.innerText = "Status: Desconectado.";
+                console.error("Erro no fetch /status:", error);
+            }
+        }
+
+        async function manualFeed() {
+            const time = document.getElementById('manualTime').value || 3500;
+            statusDiv.innerText = "Status: Enviando...";
+            try {
+                const res = await fetch("/abrir?tempo=" + time);
+                const txt = await res.text();
+                statusDiv.innerText = "Status: " + txt;
+            } catch (error) {
+                statusDiv.innerText = "Status: Erro ao enviar!";
+                console.error("Erro no fetch /abrir:", error);
+            }
+        }
+
+         async function routineFeed(time) {
+            routineStatusDiv.innerText = `Status Rotina: Alimentando agora...`;
+            try {
+                await fetch("/abrir?tempo=" + time);
+            } catch (error) {
+                 console.error("Erro no fetch /abrir (rotina):", error);
+                 routineStatusDiv.innerText = "Status Rotina: Erro ao alimentar!";
+            }
+        }
+
+        function saveRoutine() {
+            const startTime = document.getElementById('startTime').value;
+            const endTime = document.getElementById('endTime').value;
+            const hours = parseInt(document.getElementById('intervalHours').value) || 0;
+            const minutes = parseInt(document.getElementById('intervalMinutes').value) || 0;
+            const openTime = document.getElementById('routineTime').value;
+
+            if (!startTime) { alert("Por favor, defina a hora de início."); return; }
+            if (hours === 0 && minutes === 0) { alert("O intervalo não pode ser zero."); return; }
+            if (minutes < 0 || minutes > 59 || hours < 0 || hours > 23) { alert("Intervalo inválido."); return; }
+
+            const intervalMs = (hours * 3600 + minutes * 60) * 1000;
+            let startTimestamp = new Date(startTime).getTime();
+
+            routineData = {
+                startTime: startTimestamp,
+                endTime: endTime ? new Date(endTime).getTime() : null,
+                intervalMs: intervalMs,
+                hours: hours,
+                minutes: minutes,
+                openTime: openTime,
+                nextFeedTime: startTimestamp
+            };
+            
+            const now = Date.now();
+            while (routineData.nextFeedTime < now && routineData.nextFeedTime < (routineData.endTime || Infinity)) {
+                 routineData.nextFeedTime += routineData.intervalMs;
+            }
+
+            localStorage.setItem('routineData', JSON.stringify(routineData));
+            startRoutineCheck();
+            cancelRoutineBtn.style.display = 'inline-block';
+            alert("Rotina salva e ativada!");
+        }
+
+        function loadRoutine() {
+            const stored = localStorage.getItem('routineData');
+            if (stored) {
+                routineData = JSON.parse(stored);
+                try {
+                    document.getElementById('startTime').value = new Date(routineData.startTime).toISOString().slice(0, 16);
+                    if(routineData.endTime) document.getElementById('endTime').value = new Date(routineData.endTime).toISOString().slice(0, 16);
+                } catch(e) { console.error("Error setting date values:", e); }
+                document.getElementById('intervalHours').value = routineData.hours;
+                document.getElementById('intervalMinutes').value = routineData.minutes;
+                document.getElementById('routineTime').value = routineData.openTime;
+
+                startRoutineCheck();
+                cancelRoutineBtn.style.display = 'inline-block';
+            } else {
+                 routineStatusDiv.innerText = "Status Rotina: Inativa";
+                 cancelRoutineBtn.style.display = 'none';
+            }
+        }
+
+        function cancelRoutine() {
+            if (confirm("Tem certeza que deseja cancelar a rotina?")) {
+                clearInterval(routineIntervalId);
+                routineIntervalId = null;
+                localStorage.removeItem('routineData');
+                routineData = {};
+                routineStatusDiv.innerText = "Status Rotina: Inativa";
+                cancelRoutineBtn.style.display = 'none';
+                document.getElementById('startTime').value = '';
+                document.getElementById('endTime').value = '';
+                document.getElementById('intervalHours').value = '';
+                document.getElementById('intervalMinutes').value = '';
+                document.getElementById('routineTime').value = '3500';
+            }
+        }
+
+       function startRoutineCheck() {
+            if (routineIntervalId) clearInterval(routineIntervalId);
+            if (!routineData.startTime) return;
+
+            const check = () => {
+                const now = Date.now();
+
+                if (now < routineData.startTime) {
+                    routineStatusDiv.innerText = `Status Rotina: Aguardando início em ${new Date(routineData.startTime).toLocaleString('pt-BR')}.`;
+                    return;
+                }
+                if (routineData.endTime && now > routineData.endTime) {
+                    routineStatusDiv.innerText = "Status Rotina: Período encerrado.";
+                    cancelRoutine();
+                    return;
+                }
+
+                while (routineData.nextFeedTime < now) {
+                    routineData.nextFeedTime += routineData.intervalMs;
+                }
+                
+                if (routineData.endTime && routineData.nextFeedTime > routineData.endTime) {
+                    routineStatusDiv.innerText = "Status Rotina: Período encerrado.";
+                    cancelRoutine();
+                    return;
+                }
+
+                // Check if it's within the minute (adjusting for potential JS delays)
+                if (now >= routineData.nextFeedTime && now < (routineData.nextFeedTime + 30000)) { 
+                    routineFeed(routineData.openTime);
+                    routineData.nextFeedTime += routineData.intervalMs; 
+                    localStorage.setItem('routineData', JSON.stringify(routineData)); 
+                }
+
+                const nextFeedDate = new Date(routineData.nextFeedTime);
+                routineStatusDiv.innerText = `Status Rotina: Ativa. Próxima: ${nextFeedDate.toLocaleString('pt-BR')}.`;
+            };
+
+            check(); 
+            routineIntervalId = setInterval(check, 30000); // Check every 30 seconds
+        }
+
+        function resetApp() {
+            if (confirm("Tem certeza que deseja reiniciar o app? Todos os dados locais (nome e rotina) serão perdidos.")) {
+                localStorage.clear();
+                location.reload(); // Reload the page to go back to initial state
+            }
+        }
+
+        // Startup
+        window.onload = () => {
+            const storedName = localStorage.getItem('petName');
+            const storedEmoji = localStorage.getItem('petEmoji');
+
+            if (storedName && storedEmoji) {
+                petName = storedName;
+                petEmoji = storedEmoji;
+                showMainScreen();
+            } else {
+                showWelcomeScreen();
+            }
+        };
+    </script>
+</body>
+</html>
