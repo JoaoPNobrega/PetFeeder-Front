@@ -10,8 +10,8 @@
 #include <ArduinoJson.h>
 
 //DEFINIÇÕES GERAIS
-#define WIFI_SSID "VIAWEB_FIBRA_PEDRINHO_33382360"
-#define WIFI_PASSWORD "Apolonobrega25"
+#define WIFI_SSID "uaifai-brum"
+#define WIFI_PASSWORD "bemvindoaocesar"
 #define DATABASE_URL "https://petfeed-se-default-rtdb.firebaseio.com/"
 #define DATABASE_SECRET "N85woKV3Tfz1UIWfk0RPAUsLWUcT2FPmuAGErA1h"
 
